@@ -9,7 +9,7 @@ const z32 = require('z32')
 const b4a = require('b4a')
 
 class AutopassPairer extends ReadyResource {
-  constructor (store, invite, opts) {
+  constructor (store, invite, opts = {}) {
     super()
 
     this.store = store
