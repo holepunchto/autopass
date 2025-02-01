@@ -2,16 +2,17 @@
 
 const Autobase = require('autobase')
 const BlindPairing = require('blind-pairing')
-const Hyperbee = require('hyperbee')
+const HyperDB = require('hyperdb')
 const Hyperswarm = require('hyperswarm')
 const ReadyResource = require('ready-resource')
 const z32 = require('z32')
 const b4a = require('b4a')
+const { Router, dispatch } = require('./spec/hyperdispatch')
+const db = require('./spec/db/index.js')
 
 class AutopassPairer extends ReadyResource {
   constructor (store, invite, opts = {}) {
     super()
-
     this.store = store
     this.invite = invite
     this.swarm = null
@@ -27,24 +28,21 @@ class AutopassPairer extends ReadyResource {
 
   async _open () {
     await this.store.ready()
-
     this.swarm = new Hyperswarm({
       keyPair: await this.store.createKeyPair('hyperswarm'),
       bootstrap: this.bootstrap
     })
 
-    const store = this.store // we null this when passing it on, so avoid a nullptr
+    const store = this.store
     this.swarm.on('connection', (connection, peerInfo) => {
       store.replicate(connection)
     })
 
     this.pairing = new BlindPairing(this.swarm)
-
     const core = Autobase.getLocalCore(this.store)
     await core.ready()
     const key = core.key
     await core.close()
-
     this.candidate = this.pairing.addCandidate({
       invite: z32.decode(this.invite),
       userData: key,
@@ -96,7 +94,7 @@ class AutopassPairer extends ReadyResource {
 class Autopass extends ReadyResource {
   constructor (corestore, opts = {}) {
     super()
-
+    this.router = new Router()
     this.store = corestore
     this.swarm = opts.swarm || null
     this.base = null
@@ -105,6 +103,34 @@ class Autopass extends ReadyResource {
     this.pairing = null
     this.replicate = opts.replicate !== false
     this.debug = !!opts.key
+    // Register handlers for commands
+    this.router.add('@autopass-namespace/removeWriter', async (data, context) => {
+      await context.base.removeWriter(z32.decode(data))
+      return { success: true }
+    })
+
+    this.router.add('@autopass-namespace/addWriter', async (data, context) => {
+      await context.base.addWriter(z32.decode(data.value))
+      return { success: true }
+    })
+
+    this.router.add('@autopass-namespace/put', async (data, context) => {
+      await context.view.insert('@autopass-namespace/autopass', data)
+      await context.view.flush()
+      return { success: true }
+    })
+
+    this.router.add('@autopass-namespace/del', async (data, context) => {
+      await context.view.delete('@autopass-namespace/autopass', { key: data.key })
+      await context.view.flush()
+      return { success: true }
+    })
+
+    this.router.add('@autopass-namespace/addInvite', async (data, context) => {
+      await context.view.insert('@autopass-namespace/invite', data)
+      await context.view.flush()
+      return { success: true }
+    })
 
     this._boot(opts)
     this.ready().catch(noop)
@@ -117,36 +143,25 @@ class Autopass extends ReadyResource {
     this.base = new Autobase(this.store, key, {
       encrypt: true,
       encryptionKey,
-      valueEncoding: 'json',
       open (store) {
-        return new Hyperbee(store.get('view'), {
+        return HyperDB.bee(store.get('view'), db, {
           extension: false,
-          keyEncoding: 'utf-8',
-          valueEncoding: 'json'
+          autoUpdate: true
         })
       },
       // New data blocks will be added using the apply function
-      async apply (nodes, view, base) {
-        for (const node of nodes) {
-          const op = node.value
-
-          // Add support for adding other peers as a writer to the base
-          if (op.type === 'addWriter') {
-            await base.addWriter(z32.decode(op.key))
-          } else if (op.type === 'removeWriter') {
-            await base.removeWriter(z32.decode(op.key))
-          } else if (op.type === 'addRecord') {
-            // This adds a new record
-            await view.put(op.key, op.value)
-          } else if (op.type === 'removeRecord') {
-            // Remove an existing record
-            await view.del(op.key)
-          }
-        }
-      }
+      apply: this._apply.bind(this)
     })
 
-    this.base.on('update', () => this.emit('update'))
+    this.base.on('update', () => {
+      this.emit('update')
+    })
+  }
+
+  async _apply (nodes, view, base) {
+    for (const node of nodes) {
+      await this.router.dispatch(node.value, { view, base })
+    }
   }
 
   async _open () {
@@ -154,7 +169,6 @@ class Autopass extends ReadyResource {
     if (this.replicate) await this._replicate()
   }
 
-  // Close the base
   async _close () {
     if (this.swarm) {
       await this.member.close()
@@ -164,23 +178,18 @@ class Autopass extends ReadyResource {
     await this.base.close()
   }
 
-  // Need this key to become a writer
   get writerKey () {
     return this.base.local.key
   }
 
-  // Return bootstrap key of the base
-  // This is what other peers should use to bootstrap the base from
   get key () {
     return this.base.key
   }
 
-  // Find peers in Hyperswarm using this
   get discoveryKey () {
     return this.base.discoveryKey
   }
 
-  // Encryption key for the base
   get encryptionKey () {
     return this.base.encryptionKey
   }
@@ -191,101 +200,84 @@ class Autopass extends ReadyResource {
 
   async createInvite (opts) {
     if (this.opened === false) await this.ready()
-    const existing = await this.get('autopass/invite')
-    if (existing) return existing.invite
+    const existing = await this.base.view.findOne('@autopass-namespace/invite', {})
+    if (existing) {
+      return existing.invite
+    }
     const { id, invite, publicKey, expires } = BlindPairing.createInvite(this.base.key)
+
     const record = { id: z32.encode(id), invite: z32.encode(invite), publicKey: z32.encode(publicKey), expires }
-    await this.add('autopass/invite', record)
+    await this.base.append(dispatch('@autopass-namespace/addInvite', record))
     return record.invite
   }
 
-  // Get data of all indexes in the base
   list (opts) {
-    return this.base.view.createReadStream(opts)
+    const queryStreams = this.base.view.find('@autopass-namespace/autopass', {})
+    return queryStreams
   }
 
-  // Get data stored in a specific key
   async get (key) {
-    const node = await this.base.view.get(key)
-    if (node === null) return null
-    return node.value
+    const queryStreams = await this.base.view.get('@autopass-namespace/autopass', { key })
+    const data = await queryStreams
+    if (data === null) {
+      return null
+    }
+    return data.value
   }
 
-  // Add a peer as a writer
   async addWriter (key) {
-    await this.base.append({
-      type: 'addWriter',
-      key: b4a.isBuffer(key) ? z32.encode(key) : key
-    })
+    const mm = b4a.isBuffer(key) ? z32.encode(key) : key
+    await this.base.append(dispatch('@autopass-namespace/addWriter', { key: '', value: mm }))
 
     return true
   }
 
-  // To later add removeWriter
   async removeWriter (key) {
-    await this.base.append({
-      type: 'removeWriter',
-      key: b4a.isBuffer(key) ? z32.encode(key) : key
-    })
+    await this.base.append(dispatch('@autopass-namespace/removeWriter', b4a.isBuffer(key) ? z32.encode(key) : key))
   }
 
-  // Check if the base is writable
   get writable () {
     return this.base.writable
   }
 
-  // Start Replicating the base across peers
   async _replicate () {
+    await this.base.ready()
     if (this.swarm === null) {
       this.swarm = new Hyperswarm({
         keyPair: await this.store.createKeyPair('hyperswarm'),
         bootstrap: this.bootstrap
       })
-
       this.swarm.on('connection', (connection, peerInfo) => {
         this.store.replicate(connection)
       })
     }
     this.pairing = new BlindPairing(this.swarm)
-
     this.member = this.pairing.addMember({
       discoveryKey: this.base.discoveryKey,
       onadd: async (candidate) => {
         const id = z32.encode(candidate.inviteId)
-        const inv = await this.get('autopass/invite')
-
-        if (inv.id !== id) return
-
+        const inv = await this.base.view.findOne('@autopass-namespace/invite', {})
+        if (inv.id !== id) {
+          return
+        }
         candidate.open(z32.decode(inv.publicKey))
-
         await this.addWriter(candidate.userData)
-
         candidate.confirm({
           key: this.base.key,
           encryptionKey: this.base.encryptionKey
         })
       }
     })
-
-    this.swarm.join(this.base.discoveryKey)
+    await this.member.flushed()
+    await this.swarm.join(this.base.discoveryKey)
   }
 
-  // Append a key/value to the base
   async add (key, value) {
-    await this.base.append({
-      type: 'addRecord',
-      key,
-      value
-    })
+    await this.base.append(dispatch('@autopass-namespace/put', { key, value }))
   }
 
-  // Remove a key pair
   async remove (key) {
-    await this.base.append({
-      type: 'removeRecord',
-      key,
-      value: null
-    })
+    await this.base.append(dispatch('@autopass-namespace/del', { key, value: '' }))
   }
 } // end class
 

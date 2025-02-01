@@ -19,7 +19,11 @@
     "autobase": "^6.5.12",
     "b4a": "^1.6.7",
     "blind-pairing": "^2.3.1",
-    "hyperbee": "^2.20.7",
+    "hyperbee": "^2.21.2",
+    "hypercore": "^10.38.2",
+    "hyperdb": "^4.8.0",
+    "hyperdispatch": "^1.0.2",
+    "hyperschema": "^1.7.2",
     "hyperswarm": "^4.8.4",
     "ready-resource": "^1.1.1"
   }

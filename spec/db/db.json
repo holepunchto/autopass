@@ -1,0 +1,32 @@
+{
+  "version": 0,
+  "offset": 0,
+  "schema": [
+    {
+      "name": "autopass",
+      "namespace": "autopass-namespace",
+      "id": 0,
+      "type": 1,
+      "indexes": [],
+      "schema": "@autopass-namespace/autopass",
+      "derived": false,
+      "key": [
+        "key"
+      ],
+      "trigger": null
+    },
+    {
+      "name": "invite",
+      "namespace": "autopass-namespace",
+      "id": 1,
+      "type": 1,
+      "indexes": [],
+      "schema": "@autopass-namespace/invite",
+      "derived": false,
+      "key": [
+        "id"
+      ],
+      "trigger": null
+    }
+  ]
+}

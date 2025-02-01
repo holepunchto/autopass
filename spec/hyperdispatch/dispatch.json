@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "schema": [
+    {
+      "id": 0,
+      "name": "@autopass-namespace/removeWriter",
+      "requestType": "@autopass-namespace/autopass",
+      "version": 1
+    },
+    {
+      "id": 1,
+      "name": "@autopass-namespace/addWriter",
+      "requestType": "@autopass-namespace/autopass",
+      "version": 1
+    },
+    {
+      "id": 2,
+      "name": "@autopass-namespace/put",
+      "requestType": "@autopass-namespace/autopass",
+      "version": 1
+    },
+    {
+      "id": 3,
+      "name": "@autopass-namespace/del",
+      "requestType": "@autopass-namespace/autopass",
+      "version": 1
+    },
+    {
+      "id": 4,
+      "name": "@autopass-namespace/addInvite",
+      "requestType": "@autopass-namespace/invite",
+      "version": 1
+    }
+  ]
+}
