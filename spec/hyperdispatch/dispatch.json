@@ -4,13 +4,13 @@
     {
       "id": 0,
       "name": "@autopass-namespace/removeWriter",
-      "requestType": "@autopass-namespace/autopass",
+      "requestType": "@autopass-namespace/writer",
       "version": 1
     },
     {
       "id": 1,
       "name": "@autopass-namespace/addWriter",
-      "requestType": "@autopass-namespace/autopass",
+      "requestType": "@autopass-namespace/writer",
       "version": 1
     },
     {
@@ -22,7 +22,7 @@
     {
       "id": 3,
       "name": "@autopass-namespace/del",
-      "requestType": "@autopass-namespace/autopass",
+      "requestType": "@autopass-namespace/delete",
       "version": 1
     },
     {

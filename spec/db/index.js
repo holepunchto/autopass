@@ -61,7 +61,7 @@ const collection0 = {
 
 // '@autopass-namespace/invite' collection key
 const collection1_key = new IndexEncoder([
-  IndexEncoder.STRING
+  IndexEncoder.BUFFER
 ], { prefix: 1 })
 
 function collection1_indexify (record) {
@@ -114,9 +114,121 @@ const collection1 = {
   indexes: []
 }
 
+// '@autopass-namespace/writer' collection key
+const collection2_key = new IndexEncoder([
+  IndexEncoder.BUFFER
+], { prefix: 2 })
+
+function collection2_indexify (record) {
+  const a = record.key
+  return a === undefined ? [] : [a]
+}
+
+// '@autopass-namespace/writer' value encoding
+const collection2_enc = getEncoding('@autopass-namespace/writer/hyperdb#2')
+
+// '@autopass-namespace/writer' reconstruction function
+function collection2_reconstruct (version, keyBuf, valueBuf) {
+  const key = collection2_key.decode(keyBuf)
+  setVersion(version)
+  const record = c.decode(collection2_enc, valueBuf)
+  record.key = key[0]
+  return record
+}
+// '@autopass-namespace/writer' key reconstruction function
+function collection2_reconstruct_key (keyBuf) {
+  const key = collection2_key.decode(keyBuf)
+  return {
+    key: key[0]
+  }
+}
+
+// '@autopass-namespace/writer'
+const collection2 = {
+  name: '@autopass-namespace/writer',
+  id: 2,
+  encodeKey (record) {
+    const key = [record.key]
+    return collection2_key.encode(key)
+  },
+  encodeKeyRange ({ gt, lt, gte, lte } = {}) {
+    return collection2_key.encodeRange({
+      gt: gt ? collection2_indexify(gt) : null,
+      lt: lt ? collection2_indexify(lt) : null,
+      gte: gte ? collection2_indexify(gte) : null,
+      lte: lte ? collection2_indexify(lte) : null
+    })
+  },
+  encodeValue (version, record) {
+    setVersion(version)
+    return c.encode(collection2_enc, record)
+  },
+  trigger: null,
+  reconstruct: collection2_reconstruct,
+  reconstructKey: collection2_reconstruct_key,
+  indexes: []
+}
+
+// '@autopass-namespace/delete' collection key
+const collection3_key = new IndexEncoder([
+  IndexEncoder.STRING
+], { prefix: 3 })
+
+function collection3_indexify (record) {
+  const a = record.key
+  return a === undefined ? [] : [a]
+}
+
+// '@autopass-namespace/delete' value encoding
+const collection3_enc = getEncoding('@autopass-namespace/delete/hyperdb#3')
+
+// '@autopass-namespace/delete' reconstruction function
+function collection3_reconstruct (version, keyBuf, valueBuf) {
+  const key = collection3_key.decode(keyBuf)
+  setVersion(version)
+  const record = c.decode(collection3_enc, valueBuf)
+  record.key = key[0]
+  return record
+}
+// '@autopass-namespace/delete' key reconstruction function
+function collection3_reconstruct_key (keyBuf) {
+  const key = collection3_key.decode(keyBuf)
+  return {
+    key: key[0]
+  }
+}
+
+// '@autopass-namespace/delete'
+const collection3 = {
+  name: '@autopass-namespace/delete',
+  id: 3,
+  encodeKey (record) {
+    const key = [record.key]
+    return collection3_key.encode(key)
+  },
+  encodeKeyRange ({ gt, lt, gte, lte } = {}) {
+    return collection3_key.encodeRange({
+      gt: gt ? collection3_indexify(gt) : null,
+      lt: lt ? collection3_indexify(lt) : null,
+      gte: gte ? collection3_indexify(gte) : null,
+      lte: lte ? collection3_indexify(lte) : null
+    })
+  },
+  encodeValue (version, record) {
+    setVersion(version)
+    return c.encode(collection3_enc, record)
+  },
+  trigger: null,
+  reconstruct: collection3_reconstruct,
+  reconstructKey: collection3_reconstruct_key,
+  indexes: []
+}
+
 const collections = [
   collection0,
-  collection1
+  collection1,
+  collection2,
+  collection3
 ]
 
 const indexes = [
@@ -128,6 +240,8 @@ function resolveCollection (name) {
   switch (name) {
     case '@autopass-namespace/autopass': return collection0
     case '@autopass-namespace/invite': return collection1
+    case '@autopass-namespace/writer': return collection2
+    case '@autopass-namespace/delete': return collection3
     default: return null
   }
 }

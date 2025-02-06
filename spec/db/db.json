@@ -27,6 +27,32 @@
         "id"
       ],
       "trigger": null
+    },
+    {
+      "name": "writer",
+      "namespace": "autopass-namespace",
+      "id": 2,
+      "type": 1,
+      "indexes": [],
+      "schema": "@autopass-namespace/writer",
+      "derived": false,
+      "key": [
+        "key"
+      ],
+      "trigger": null
+    },
+    {
+      "name": "delete",
+      "namespace": "autopass-namespace",
+      "id": 3,
+      "type": 1,
+      "indexes": [],
+      "schema": "@autopass-namespace/delete",
+      "derived": false,
+      "key": [
+        "key"
+      ],
+      "trigger": null
     }
   ]
 }

@@ -57,10 +57,21 @@ class AutopassPairer extends ReadyResource {
         }
         this.swarm = null
         this.store = null
-        if (this.onresolve) this.onresolve(this.pass)
+        if (this.onresolve) this._whenWritable()
         this.candidate.close().catch(noop)
       }
     })
+  }
+
+  _whenWritable () {
+    if (this.pass.base.writable) return
+    const check = () => {
+      if (this.pass.base.writable) {
+        this.pass.base.off('update', check)
+        this.onresolve(this.pass)
+      }
+    }
+    this.pass.base.on('update', check)
   }
 
   async _close () {
@@ -105,12 +116,12 @@ class Autopass extends ReadyResource {
     this.debug = !!opts.key
     // Register handlers for commands
     this.router.add('@autopass-namespace/removeWriter', async (data, context) => {
-      await context.base.removeWriter(z32.decode(data))
+      await context.base.removeWriter(data.key)
       return { success: true }
     })
 
     this.router.add('@autopass-namespace/addWriter', async (data, context) => {
-      await context.base.addWriter(z32.decode(data.value))
+      await context.base.addWriter(data.key)
       return { success: true }
     })
 
@@ -202,18 +213,17 @@ class Autopass extends ReadyResource {
     if (this.opened === false) await this.ready()
     const existing = await this.base.view.findOne('@autopass-namespace/invite', {})
     if (existing) {
-      return existing.invite
+      return z32.encode(existing.invite)
     }
     const { id, invite, publicKey, expires } = BlindPairing.createInvite(this.base.key)
 
-    const record = { id: z32.encode(id), invite: z32.encode(invite), publicKey: z32.encode(publicKey), expires }
+    const record = { id, invite, publicKey, expires }
     await this.base.append(dispatch('@autopass-namespace/addInvite', record))
-    return record.invite
+    return z32.encode(record.invite)
   }
 
   list (opts) {
-    const queryStreams = this.base.view.find('@autopass-namespace/autopass', {})
-    return queryStreams
+    return this.base.view.find('@autopass-namespace/autopass', {})
   }
 
   async get (key) {
@@ -226,14 +236,12 @@ class Autopass extends ReadyResource {
   }
 
   async addWriter (key) {
-    const mm = b4a.isBuffer(key) ? z32.encode(key) : key
-    await this.base.append(dispatch('@autopass-namespace/addWriter', { key: '', value: mm }))
-
+    await this.base.append(dispatch('@autopass-namespace/addWriter', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
     return true
   }
 
   async removeWriter (key) {
-    await this.base.append(dispatch('@autopass-namespace/removeWriter', b4a.isBuffer(key) ? z32.encode(key) : key))
+    await this.base.append(dispatch('@autopass-namespace/removeWriter', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
   }
 
   get writable () {
@@ -255,12 +263,12 @@ class Autopass extends ReadyResource {
     this.member = this.pairing.addMember({
       discoveryKey: this.base.discoveryKey,
       onadd: async (candidate) => {
-        const id = z32.encode(candidate.inviteId)
+        const id = candidate.inviteId
         const inv = await this.base.view.findOne('@autopass-namespace/invite', {})
-        if (inv.id !== id) {
+        if (!b4a.equals(inv.id, id)) {
           return
         }
-        candidate.open(z32.decode(inv.publicKey))
+        candidate.open(inv.publicKey)
         await this.addWriter(candidate.userData)
         candidate.confirm({
           key: this.base.key,
@@ -268,8 +276,7 @@ class Autopass extends ReadyResource {
         })
       }
     })
-    await this.member.flushed()
-    await this.swarm.join(this.base.discoveryKey)
+    this.swarm.join(this.base.discoveryKey)
   }
 
   async add (key, value) {
@@ -277,7 +284,7 @@ class Autopass extends ReadyResource {
   }
 
   async remove (key) {
-    await this.base.append(dispatch('@autopass-namespace/del', { key, value: '' }))
+    await this.base.append(dispatch('@autopass-namespace/del', { key }))
   }
 } // end class
 

@@ -19,6 +19,7 @@
     "autobase": "^6.5.12",
     "b4a": "^1.6.7",
     "blind-pairing": "^2.3.1",
+    "compact-encoding": "^2.16.0",
     "hyperbee": "^2.21.2",
     "hypercore": "^10.38.2",
     "hyperdb": "^4.8.0",

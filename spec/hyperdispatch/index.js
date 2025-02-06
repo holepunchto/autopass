@@ -93,12 +93,12 @@ function dispatch (name, message, { version = defaultVersion } = {}) {
 
 const route0 = {
   id: 0,
-  enc: getEncoding('@autopass-namespace/autopass')
+  enc: getEncoding('@autopass-namespace/writer')
 }
 
 const route1 = {
   id: 1,
-  enc: getEncoding('@autopass-namespace/autopass')
+  enc: getEncoding('@autopass-namespace/writer')
 }
 
 const route2 = {
@@ -108,7 +108,7 @@ const route2 = {
 
 const route3 = {
   id: 3,
-  enc: getEncoding('@autopass-namespace/autopass')
+  enc: getEncoding('@autopass-namespace/delete')
 }
 
 const route4 = {

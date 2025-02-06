@@ -22,6 +22,34 @@
       ]
     },
     {
+      "name": "writer",
+      "namespace": "autopass-namespace",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "key",
+          "required": true,
+          "type": "buffer",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "delete",
+      "namespace": "autopass-namespace",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "key",
+          "required": true,
+          "type": "string",
+          "version": 1
+        }
+      ]
+    },
+    {
       "name": "invite",
       "namespace": "autopass-namespace",
       "compact": false,
@@ -30,19 +58,19 @@
         {
           "name": "id",
           "required": true,
-          "type": "string",
+          "type": "buffer",
           "version": 1
         },
         {
           "name": "invite",
           "required": true,
-          "type": "string",
+          "type": "buffer",
           "version": 1
         },
         {
           "name": "publicKey",
           "required": true,
-          "type": "string",
+          "type": "buffer",
           "version": 1
         },
         {

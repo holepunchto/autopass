@@ -36,24 +36,58 @@ const encoding0 = {
   }
 }
 
-// @autopass-namespace/invite
+// @autopass-namespace/writer
 const encoding1 = {
   preencode (state, m) {
-    c.string.preencode(state, m.id)
-    c.string.preencode(state, m.invite)
-    c.string.preencode(state, m.publicKey)
-    c.int.preencode(state, m.expires)
+    c.buffer.preencode(state, m.key)
   },
   encode (state, m) {
-    c.string.encode(state, m.id)
-    c.string.encode(state, m.invite)
-    c.string.encode(state, m.publicKey)
-    c.int.encode(state, m.expires)
+    c.buffer.encode(state, m.key)
+  },
+  decode (state) {
+    const r0 = c.buffer.decode(state)
+
+    return {
+      key: r0
+    }
+  }
+}
+
+// @autopass-namespace/delete
+const encoding2 = {
+  preencode (state, m) {
+    c.string.preencode(state, m.key)
+  },
+  encode (state, m) {
+    c.string.encode(state, m.key)
   },
   decode (state) {
     const r0 = c.string.decode(state)
-    const r1 = c.string.decode(state)
-    const r2 = c.string.decode(state)
+
+    return {
+      key: r0
+    }
+  }
+}
+
+// @autopass-namespace/invite
+const encoding3 = {
+  preencode (state, m) {
+    c.buffer.preencode(state, m.id)
+    c.buffer.preencode(state, m.invite)
+    c.buffer.preencode(state, m.publicKey)
+    c.int.preencode(state, m.expires)
+  },
+  encode (state, m) {
+    c.buffer.encode(state, m.id)
+    c.buffer.encode(state, m.invite)
+    c.buffer.encode(state, m.publicKey)
+    c.int.encode(state, m.expires)
+  },
+  decode (state) {
+    const r0 = c.buffer.decode(state)
+    const r1 = c.buffer.decode(state)
+    const r2 = c.buffer.decode(state)
     const r3 = c.int.decode(state)
 
     return {
@@ -66,7 +100,7 @@ const encoding1 = {
 }
 
 // @autopass-namespace/autopass/hyperdb#0
-const encoding2 = {
+const encoding4 = {
   preencode (state, m) {
     state.end++ // max flag is 1 so always one byte
 
@@ -90,20 +124,20 @@ const encoding2 = {
 }
 
 // @autopass-namespace/invite/hyperdb#1
-const encoding3 = {
+const encoding5 = {
   preencode (state, m) {
-    c.string.preencode(state, m.invite)
-    c.string.preencode(state, m.publicKey)
+    c.buffer.preencode(state, m.invite)
+    c.buffer.preencode(state, m.publicKey)
     c.int.preencode(state, m.expires)
   },
   encode (state, m) {
-    c.string.encode(state, m.invite)
-    c.string.encode(state, m.publicKey)
+    c.buffer.encode(state, m.invite)
+    c.buffer.encode(state, m.publicKey)
     c.int.encode(state, m.expires)
   },
   decode (state) {
-    const r1 = c.string.decode(state)
-    const r2 = c.string.decode(state)
+    const r1 = c.buffer.decode(state)
+    const r2 = c.buffer.decode(state)
     const r3 = c.int.decode(state)
 
     return {
@@ -114,6 +148,24 @@ const encoding3 = {
     }
   }
 }
+
+// @autopass-namespace/writer/hyperdb#2
+const encoding6 = {
+  preencode (state, m) {
+
+  },
+  encode (state, m) {
+
+  },
+  decode (state) {
+    return {
+      key: null
+    }
+  }
+}
+
+// @autopass-namespace/delete/hyperdb#3
+const encoding7 = encoding6
 
 function setVersion (v) {
   version = v
@@ -138,9 +190,13 @@ function getEnum (name) {
 function getEncoding (name) {
   switch (name) {
     case '@autopass-namespace/autopass': return encoding0
-    case '@autopass-namespace/invite': return encoding1
-    case '@autopass-namespace/autopass/hyperdb#0': return encoding2
-    case '@autopass-namespace/invite/hyperdb#1': return encoding3
+    case '@autopass-namespace/writer': return encoding1
+    case '@autopass-namespace/delete': return encoding2
+    case '@autopass-namespace/invite': return encoding3
+    case '@autopass-namespace/autopass/hyperdb#0': return encoding4
+    case '@autopass-namespace/invite/hyperdb#1': return encoding5
+    case '@autopass-namespace/writer/hyperdb#2': return encoding6
+    case '@autopass-namespace/delete/hyperdb#3': return encoding7
     default: throw new Error('Encoder not found ' + name)
   }
 }

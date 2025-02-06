@@ -20,20 +20,43 @@ templateNamespace.register({
   }
   ]
 })
+
+templateNamespace.register({
+  name: 'writer',
+  compact: false,
+  fields: [{
+    name: 'key',
+    type: 'buffer',
+    required: true
+  }
+  ]
+})
+
+templateNamespace.register({
+  name: 'delete',
+  compact: false,
+  fields: [{
+    name: 'key',
+    type: 'string',
+    required: true
+  }
+  ]
+})
+
 templateNamespace.register({
   name: 'invite',
   compact: false,
   fields: [{
     name: 'id',
-    type: 'string',
+    type: 'buffer',
     required: true
   }, {
     name: 'invite',
-    type: 'string',
+    type: 'buffer',
     required: true
   }, {
     name: 'publicKey',
-    type: 'string',
+    type: 'buffer',
     required: true
   }, {
     name: 'expires',
@@ -56,17 +79,29 @@ blobs.collections.register({
   schema: '@autopass-namespace/invite',
   key: ['id']
 })
+blobs.collections.register({
+  name: 'writer',
+  schema: '@autopass-namespace/writer',
+  key: ['key']
+})
+
+blobs.collections.register({
+  name: 'delete',
+  schema: '@autopass-namespace/delete',
+  key: ['key']
+})
+
 HyperdbBuilder.toDisk(dbTemplate)
 
 const hyperdispatch = Hyperdispatch.from('./spec/schema', './spec/hyperdispatch')
 const namespace = hyperdispatch.namespace('autopass-namespace')
 namespace.register({
   name: 'removeWriter',
-  requestType: '@autopass-namespace/autopass'
+  requestType: '@autopass-namespace/writer'
 })
 namespace.register({
   name: 'addWriter',
-  requestType: '@autopass-namespace/autopass'
+  requestType: '@autopass-namespace/writer'
 })
 namespace.register({
   name: 'put',
@@ -74,7 +109,7 @@ namespace.register({
 })
 namespace.register({
   name: 'del',
-  requestType: '@autopass-namespace/autopass'
+  requestType: '@autopass-namespace/delete'
 })
 namespace.register(({
   name: 'addInvite',
