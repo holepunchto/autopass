@@ -19,19 +19,19 @@ class Router {
 
   add (name, handler) {
     switch (name) {
-      case '@autopass-namespace/removeWriter':
+      case '@autopass/removeWriter':
         this._handler0 = handler
         break
-      case '@autopass-namespace/addWriter':
+      case '@autopass/addWriter':
         this._handler1 = handler
         break
-      case '@autopass-namespace/put':
+      case '@autopass/put':
         this._handler2 = handler
         break
-      case '@autopass-namespace/del':
+      case '@autopass/del':
         this._handler3 = handler
         break
-      case '@autopass-namespace/addInvite':
+      case '@autopass/addInvite':
         this._handler4 = handler
         break
       default:
@@ -41,11 +41,11 @@ class Router {
   }
 
   _checkAll () {
-    assert(this._handler0 !== null, 'Missing handler for "@autopass-namespace/removeWriter"')
-    assert(this._handler1 !== null, 'Missing handler for "@autopass-namespace/addWriter"')
-    assert(this._handler2 !== null, 'Missing handler for "@autopass-namespace/put"')
-    assert(this._handler3 !== null, 'Missing handler for "@autopass-namespace/del"')
-    assert(this._handler4 !== null, 'Missing handler for "@autopass-namespace/addInvite"')
+    assert(this._handler0 !== null, 'Missing handler for "@autopass/removeWriter"')
+    assert(this._handler1 !== null, 'Missing handler for "@autopass/addWriter"')
+    assert(this._handler2 !== null, 'Missing handler for "@autopass/put"')
+    assert(this._handler3 !== null, 'Missing handler for "@autopass/del"')
+    assert(this._handler4 !== null, 'Missing handler for "@autopass/addInvite"')
   }
 
   async dispatch (encoded, context) {
@@ -93,40 +93,40 @@ function dispatch (name, message, { version = defaultVersion } = {}) {
 
 const route0 = {
   id: 0,
-  enc: getEncoding('@autopass-namespace/writer')
+  enc: getEncoding('@autopass/writer')
 }
 
 const route1 = {
   id: 1,
-  enc: getEncoding('@autopass-namespace/writer')
+  enc: getEncoding('@autopass/writer')
 }
 
 const route2 = {
   id: 2,
-  enc: getEncoding('@autopass-namespace/autopass')
+  enc: getEncoding('@autopass/records')
 }
 
 const route3 = {
   id: 3,
-  enc: getEncoding('@autopass-namespace/delete')
+  enc: getEncoding('@autopass/delete')
 }
 
 const route4 = {
   id: 4,
-  enc: getEncoding('@autopass-namespace/invite')
+  enc: getEncoding('@autopass/invite')
 }
 
 function getEncoderAndId (name) {
   switch (name) {
-    case '@autopass-namespace/removeWriter':
+    case '@autopass/removeWriter':
       return route0
-    case '@autopass-namespace/addWriter':
+    case '@autopass/addWriter':
       return route1
-    case '@autopass-namespace/put':
+    case '@autopass/put':
       return route2
-    case '@autopass-namespace/del':
+    case '@autopass/del':
       return route3
-    case '@autopass-namespace/addInvite':
+    case '@autopass/addInvite':
       return route4
     default:
       throw new Error('Handler not found for name: ' + name)

@@ -3,11 +3,11 @@ const HyperdbBuilder = require('hyperdb/builder')
 const Hyperdispatch = require('hyperdispatch')
 
 // SCHEMA CREATION START //
-const schemaTemplate = Hyperschema.from('./spec/schema')
-const templateNamespace = schemaTemplate.namespace('autopass-namespace')
+const autopass = Hyperschema.from('./spec/schema')
+const template = autopass.namespace('autopass')
 // You can find a list of supported data types here: https://github.com/holepunchto/compact-encoding
-templateNamespace.register({
-  name: 'autopass',
+template.register({
+  name: 'records',
   compact: false,
   fields: [{
     name: 'key',
@@ -21,7 +21,7 @@ templateNamespace.register({
   ]
 })
 
-templateNamespace.register({
+template.register({
   name: 'writer',
   compact: false,
   fields: [{
@@ -32,7 +32,7 @@ templateNamespace.register({
   ]
 })
 
-templateNamespace.register({
+template.register({
   name: 'delete',
   compact: false,
   fields: [{
@@ -43,7 +43,7 @@ templateNamespace.register({
   ]
 })
 
-templateNamespace.register({
+template.register({
   name: 'invite',
   compact: false,
   fields: [{
@@ -65,54 +65,54 @@ templateNamespace.register({
   }
   ]
 })
-Hyperschema.toDisk(schemaTemplate)
+Hyperschema.toDisk(autopass)
 
 const dbTemplate = HyperdbBuilder.from('./spec/schema', './spec/db')
-const blobs = dbTemplate.namespace('autopass-namespace')
+const blobs = dbTemplate.namespace('autopass')
 blobs.collections.register({
-  name: 'autopass',
-  schema: '@autopass-namespace/autopass',
+  name: 'records',
+  schema: '@autopass/records',
   key: ['key']
 })
 blobs.collections.register({
   name: 'invite',
-  schema: '@autopass-namespace/invite',
+  schema: '@autopass/invite',
   key: ['id']
 })
 blobs.collections.register({
   name: 'writer',
-  schema: '@autopass-namespace/writer',
+  schema: '@autopass/writer',
   key: ['key']
 })
 
 blobs.collections.register({
   name: 'delete',
-  schema: '@autopass-namespace/delete',
+  schema: '@autopass/delete',
   key: ['key']
 })
 
 HyperdbBuilder.toDisk(dbTemplate)
 
 const hyperdispatch = Hyperdispatch.from('./spec/schema', './spec/hyperdispatch')
-const namespace = hyperdispatch.namespace('autopass-namespace')
+const namespace = hyperdispatch.namespace('autopass')
 namespace.register({
   name: 'removeWriter',
-  requestType: '@autopass-namespace/writer'
+  requestType: '@autopass/writer'
 })
 namespace.register({
   name: 'addWriter',
-  requestType: '@autopass-namespace/writer'
+  requestType: '@autopass/writer'
 })
 namespace.register({
   name: 'put',
-  requestType: '@autopass-namespace/autopass'
+  requestType: '@autopass/records'
 })
 namespace.register({
   name: 'del',
-  requestType: '@autopass-namespace/delete'
+  requestType: '@autopass/delete'
 })
 namespace.register(({
   name: 'addInvite',
-  requestType: '@autopass-namespace/invite'
+  requestType: '@autopass/invite'
 }))
 Hyperdispatch.toDisk(hyperdispatch)

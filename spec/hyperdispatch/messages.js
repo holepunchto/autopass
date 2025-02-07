@@ -9,7 +9,7 @@ const { c } = require('hyperschema/runtime')
 // eslint-disable-next-line no-unused-vars
 let version = VERSION
 
-// @autopass-namespace/autopass
+// @autopass/records
 const encoding0 = {
   preencode (state, m) {
     c.string.preencode(state, m.key)
@@ -36,7 +36,7 @@ const encoding0 = {
   }
 }
 
-// @autopass-namespace/writer
+// @autopass/writer
 const encoding1 = {
   preencode (state, m) {
     c.buffer.preencode(state, m.key)
@@ -53,7 +53,7 @@ const encoding1 = {
   }
 }
 
-// @autopass-namespace/delete
+// @autopass/delete
 const encoding2 = {
   preencode (state, m) {
     c.string.preencode(state, m.key)
@@ -70,7 +70,7 @@ const encoding2 = {
   }
 }
 
-// @autopass-namespace/invite
+// @autopass/invite
 const encoding3 = {
   preencode (state, m) {
     c.buffer.preencode(state, m.id)
@@ -121,10 +121,10 @@ function getEnum (name) {
 
 function getEncoding (name) {
   switch (name) {
-    case '@autopass-namespace/autopass': return encoding0
-    case '@autopass-namespace/writer': return encoding1
-    case '@autopass-namespace/delete': return encoding2
-    case '@autopass-namespace/invite': return encoding3
+    case '@autopass/records': return encoding0
+    case '@autopass/writer': return encoding1
+    case '@autopass/delete': return encoding2
+    case '@autopass/invite': return encoding3
     default: throw new Error('Encoder not found ' + name)
   }
 }

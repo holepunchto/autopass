@@ -115,32 +115,24 @@ class Autopass extends ReadyResource {
     this.replicate = opts.replicate !== false
     this.debug = !!opts.key
     // Register handlers for commands
-    this.router.add('@autopass-namespace/removeWriter', async (data, context) => {
+    this.router.add('@autopass/removeWriter', async (data, context) => {
       await context.base.removeWriter(data.key)
-      return { success: true }
     })
 
-    this.router.add('@autopass-namespace/addWriter', async (data, context) => {
+    this.router.add('@autopass/addWriter', async (data, context) => {
       await context.base.addWriter(data.key)
-      return { success: true }
     })
 
-    this.router.add('@autopass-namespace/put', async (data, context) => {
-      await context.view.insert('@autopass-namespace/autopass', data)
-      await context.view.flush()
-      return { success: true }
+    this.router.add('@autopass/put', async (data, context) => {
+      await context.view.insert('@autopass/records', data)
     })
 
-    this.router.add('@autopass-namespace/del', async (data, context) => {
-      await context.view.delete('@autopass-namespace/autopass', { key: data.key })
-      await context.view.flush()
-      return { success: true }
+    this.router.add('@autopass/del', async (data, context) => {
+      await context.view.delete('@autopass/records', { key: data.key })
     })
 
-    this.router.add('@autopass-namespace/addInvite', async (data, context) => {
-      await context.view.insert('@autopass-namespace/invite', data)
-      await context.view.flush()
-      return { success: true }
+    this.router.add('@autopass/addInvite', async (data, context) => {
+      await context.view.insert('@autopass/invite', data)
     })
 
     this._boot(opts)
@@ -173,6 +165,7 @@ class Autopass extends ReadyResource {
     for (const node of nodes) {
       await this.router.dispatch(node.value, { view, base })
     }
+    view.flush()
   }
 
   async _open () {
@@ -211,24 +204,23 @@ class Autopass extends ReadyResource {
 
   async createInvite (opts) {
     if (this.opened === false) await this.ready()
-    const existing = await this.base.view.findOne('@autopass-namespace/invite', {})
+    const existing = await this.base.view.findOne('@autopass/invite', {})
     if (existing) {
       return z32.encode(existing.invite)
     }
     const { id, invite, publicKey, expires } = BlindPairing.createInvite(this.base.key)
 
     const record = { id, invite, publicKey, expires }
-    await this.base.append(dispatch('@autopass-namespace/addInvite', record))
+    await this.base.append(dispatch('@autopass/addInvite', record))
     return z32.encode(record.invite)
   }
 
   list (opts) {
-    return this.base.view.find('@autopass-namespace/autopass', {})
+    return this.base.view.find('@autopass/records', {})
   }
 
   async get (key) {
-    const queryStreams = await this.base.view.get('@autopass-namespace/autopass', { key })
-    const data = await queryStreams
+    const data = await this.base.view.get('@autopass/records', { key })
     if (data === null) {
       return null
     }
@@ -236,12 +228,12 @@ class Autopass extends ReadyResource {
   }
 
   async addWriter (key) {
-    await this.base.append(dispatch('@autopass-namespace/addWriter', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
+    await this.base.append(dispatch('@autopass/addWriter', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
     return true
   }
 
   async removeWriter (key) {
-    await this.base.append(dispatch('@autopass-namespace/removeWriter', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
+    await this.base.append(dispatch('@autopass/removeWriter', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
   }
 
   get writable () {
@@ -264,7 +256,7 @@ class Autopass extends ReadyResource {
       discoveryKey: this.base.discoveryKey,
       onadd: async (candidate) => {
         const id = candidate.inviteId
-        const inv = await this.base.view.findOne('@autopass-namespace/invite', {})
+        const inv = await this.base.view.findOne('@autopass/invite', {})
         if (!b4a.equals(inv.id, id)) {
           return
         }
@@ -280,11 +272,11 @@ class Autopass extends ReadyResource {
   }
 
   async add (key, value) {
-    await this.base.append(dispatch('@autopass-namespace/put', { key, value }))
+    await this.base.append(dispatch('@autopass/put', { key, value }))
   }
 
   async remove (key) {
-    await this.base.append(dispatch('@autopass-namespace/del', { key }))
+    await this.base.append(dispatch('@autopass/del', { key }))
   }
 } // end class
 

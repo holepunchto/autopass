@@ -3,32 +3,32 @@
   "schema": [
     {
       "id": 0,
-      "name": "@autopass-namespace/removeWriter",
-      "requestType": "@autopass-namespace/writer",
+      "name": "@autopass/removeWriter",
+      "requestType": "@autopass/writer",
       "version": 1
     },
     {
       "id": 1,
-      "name": "@autopass-namespace/addWriter",
-      "requestType": "@autopass-namespace/writer",
+      "name": "@autopass/addWriter",
+      "requestType": "@autopass/writer",
       "version": 1
     },
     {
       "id": 2,
-      "name": "@autopass-namespace/put",
-      "requestType": "@autopass-namespace/autopass",
+      "name": "@autopass/put",
+      "requestType": "@autopass/records",
       "version": 1
     },
     {
       "id": 3,
-      "name": "@autopass-namespace/del",
-      "requestType": "@autopass-namespace/delete",
+      "name": "@autopass/del",
+      "requestType": "@autopass/delete",
       "version": 1
     },
     {
       "id": 4,
-      "name": "@autopass-namespace/addInvite",
-      "requestType": "@autopass-namespace/invite",
+      "name": "@autopass/addInvite",
+      "requestType": "@autopass/invite",
       "version": 1
     }
   ]

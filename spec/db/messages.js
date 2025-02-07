@@ -9,7 +9,7 @@ const { c } = require('hyperschema/runtime')
 // eslint-disable-next-line no-unused-vars
 let version = VERSION
 
-// @autopass-namespace/autopass
+// @autopass/records
 const encoding0 = {
   preencode (state, m) {
     c.string.preencode(state, m.key)
@@ -36,7 +36,7 @@ const encoding0 = {
   }
 }
 
-// @autopass-namespace/writer
+// @autopass/writer
 const encoding1 = {
   preencode (state, m) {
     c.buffer.preencode(state, m.key)
@@ -53,7 +53,7 @@ const encoding1 = {
   }
 }
 
-// @autopass-namespace/delete
+// @autopass/delete
 const encoding2 = {
   preencode (state, m) {
     c.string.preencode(state, m.key)
@@ -70,7 +70,7 @@ const encoding2 = {
   }
 }
 
-// @autopass-namespace/invite
+// @autopass/invite
 const encoding3 = {
   preencode (state, m) {
     c.buffer.preencode(state, m.id)
@@ -99,7 +99,7 @@ const encoding3 = {
   }
 }
 
-// @autopass-namespace/autopass/hyperdb#0
+// @autopass/records/hyperdb#0
 const encoding4 = {
   preencode (state, m) {
     state.end++ // max flag is 1 so always one byte
@@ -123,7 +123,7 @@ const encoding4 = {
   }
 }
 
-// @autopass-namespace/invite/hyperdb#1
+// @autopass/invite/hyperdb#1
 const encoding5 = {
   preencode (state, m) {
     c.buffer.preencode(state, m.invite)
@@ -149,7 +149,7 @@ const encoding5 = {
   }
 }
 
-// @autopass-namespace/writer/hyperdb#2
+// @autopass/writer/hyperdb#2
 const encoding6 = {
   preencode (state, m) {
 
@@ -164,7 +164,7 @@ const encoding6 = {
   }
 }
 
-// @autopass-namespace/delete/hyperdb#3
+// @autopass/delete/hyperdb#3
 const encoding7 = encoding6
 
 function setVersion (v) {
@@ -189,14 +189,14 @@ function getEnum (name) {
 
 function getEncoding (name) {
   switch (name) {
-    case '@autopass-namespace/autopass': return encoding0
-    case '@autopass-namespace/writer': return encoding1
-    case '@autopass-namespace/delete': return encoding2
-    case '@autopass-namespace/invite': return encoding3
-    case '@autopass-namespace/autopass/hyperdb#0': return encoding4
-    case '@autopass-namespace/invite/hyperdb#1': return encoding5
-    case '@autopass-namespace/writer/hyperdb#2': return encoding6
-    case '@autopass-namespace/delete/hyperdb#3': return encoding7
+    case '@autopass/records': return encoding0
+    case '@autopass/writer': return encoding1
+    case '@autopass/delete': return encoding2
+    case '@autopass/invite': return encoding3
+    case '@autopass/records/hyperdb#0': return encoding4
+    case '@autopass/invite/hyperdb#1': return encoding5
+    case '@autopass/writer/hyperdb#2': return encoding6
+    case '@autopass/delete/hyperdb#3': return encoding7
     default: throw new Error('Encoder not found ' + name)
   }
 }

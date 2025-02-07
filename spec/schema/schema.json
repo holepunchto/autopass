@@ -2,8 +2,8 @@
   "version": 1,
   "schema": [
     {
-      "name": "autopass",
-      "namespace": "autopass-namespace",
+      "name": "records",
+      "namespace": "autopass",
       "compact": false,
       "flagsPosition": 1,
       "fields": [
@@ -23,7 +23,7 @@
     },
     {
       "name": "writer",
-      "namespace": "autopass-namespace",
+      "namespace": "autopass",
       "compact": false,
       "flagsPosition": -1,
       "fields": [
@@ -37,7 +37,7 @@
     },
     {
       "name": "delete",
-      "namespace": "autopass-namespace",
+      "namespace": "autopass",
       "compact": false,
       "flagsPosition": -1,
       "fields": [
@@ -51,7 +51,7 @@
     },
     {
       "name": "invite",
-      "namespace": "autopass-namespace",
+      "namespace": "autopass",
       "compact": false,
       "flagsPosition": -1,
       "fields": [
