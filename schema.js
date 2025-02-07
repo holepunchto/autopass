@@ -96,11 +96,11 @@ HyperdbBuilder.toDisk(dbTemplate)
 const hyperdispatch = Hyperdispatch.from('./spec/schema', './spec/hyperdispatch')
 const namespace = hyperdispatch.namespace('autopass')
 namespace.register({
-  name: 'removeWriter',
+  name: 'remove-writer',
   requestType: '@autopass/writer'
 })
 namespace.register({
-  name: 'addWriter',
+  name: 'add-writer',
   requestType: '@autopass/writer'
 })
 namespace.register({
@@ -112,7 +112,7 @@ namespace.register({
   requestType: '@autopass/delete'
 })
 namespace.register(({
-  name: 'addInvite',
+  name: 'add-invite',
   requestType: '@autopass/invite'
 }))
 Hyperdispatch.toDisk(hyperdispatch)

@@ -115,11 +115,11 @@ class Autopass extends ReadyResource {
     this.replicate = opts.replicate !== false
     this.debug = !!opts.key
     // Register handlers for commands
-    this.router.add('@autopass/removeWriter', async (data, context) => {
+    this.router.add('@autopass/remove-writer', async (data, context) => {
       await context.base.removeWriter(data.key)
     })
 
-    this.router.add('@autopass/addWriter', async (data, context) => {
+    this.router.add('@autopass/add-writer', async (data, context) => {
       await context.base.addWriter(data.key)
     })
 
@@ -131,7 +131,7 @@ class Autopass extends ReadyResource {
       await context.view.delete('@autopass/records', { key: data.key })
     })
 
-    this.router.add('@autopass/addInvite', async (data, context) => {
+    this.router.add('@autopass/add-invite', async (data, context) => {
       await context.view.insert('@autopass/invite', data)
     })
 
@@ -165,7 +165,7 @@ class Autopass extends ReadyResource {
     for (const node of nodes) {
       await this.router.dispatch(node.value, { view, base })
     }
-    view.flush()
+    await view.flush()
   }
 
   async _open () {
@@ -211,7 +211,7 @@ class Autopass extends ReadyResource {
     const { id, invite, publicKey, expires } = BlindPairing.createInvite(this.base.key)
 
     const record = { id, invite, publicKey, expires }
-    await this.base.append(dispatch('@autopass/addInvite', record))
+    await this.base.append(dispatch('@autopass/add-invite', record))
     return z32.encode(record.invite)
   }
 
@@ -228,12 +228,12 @@ class Autopass extends ReadyResource {
   }
 
   async addWriter (key) {
-    await this.base.append(dispatch('@autopass/addWriter', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
+    await this.base.append(dispatch('@autopass/add-writer', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
     return true
   }
 
   async removeWriter (key) {
-    await this.base.append(dispatch('@autopass/removeWriter', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
+    await this.base.append(dispatch('@autopass/remove-writer', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
   }
 
   get writable () {

@@ -3,13 +3,13 @@
   "schema": [
     {
       "id": 0,
-      "name": "@autopass/removeWriter",
+      "name": "@autopass/remove-writer",
       "requestType": "@autopass/writer",
       "version": 1
     },
     {
       "id": 1,
-      "name": "@autopass/addWriter",
+      "name": "@autopass/add-writer",
       "requestType": "@autopass/writer",
       "version": 1
     },
@@ -27,7 +27,7 @@
     },
     {
       "id": 4,
-      "name": "@autopass/addInvite",
+      "name": "@autopass/add-invite",
       "requestType": "@autopass/invite",
       "version": 1
     }
