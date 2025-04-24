@@ -224,11 +224,67 @@ const collection3 = {
   indexes: []
 }
 
+// '@autopass/del-invite' collection key
+const collection4_key = new IndexEncoder([
+  IndexEncoder.BUFFER
+], { prefix: 4 })
+
+function collection4_indexify (record) {
+  const a = record.id
+  return a === undefined ? [] : [a]
+}
+
+// '@autopass/del-invite' value encoding
+const collection4_enc = getEncoding('@autopass/del-invite/hyperdb#4')
+
+// '@autopass/del-invite' reconstruction function
+function collection4_reconstruct (version, keyBuf, valueBuf) {
+  const key = collection4_key.decode(keyBuf)
+  setVersion(version)
+  const record = c.decode(collection4_enc, valueBuf)
+  record.id = key[0]
+  return record
+}
+// '@autopass/del-invite' key reconstruction function
+function collection4_reconstruct_key (keyBuf) {
+  const key = collection4_key.decode(keyBuf)
+  return {
+    id: key[0]
+  }
+}
+
+// '@autopass/del-invite'
+const collection4 = {
+  name: '@autopass/del-invite',
+  id: 4,
+  encodeKey (record) {
+    const key = [record.id]
+    return collection4_key.encode(key)
+  },
+  encodeKeyRange ({ gt, lt, gte, lte } = {}) {
+    return collection4_key.encodeRange({
+      gt: gt ? collection4_indexify(gt) : null,
+      lt: lt ? collection4_indexify(lt) : null,
+      gte: gte ? collection4_indexify(gte) : null,
+      lte: lte ? collection4_indexify(lte) : null
+    })
+  },
+  encodeValue (version, record) {
+    setVersion(version)
+    return c.encode(collection4_enc, record)
+  },
+  trigger: null,
+  reconstruct: collection4_reconstruct,
+  reconstructKey: collection4_reconstruct_key,
+  indexes: []
+}
+
 const collections = [
   collection0,
   collection1,
   collection2,
-  collection3
+  collection3,
+  collection4
 ]
 
 const indexes = [
@@ -242,6 +298,7 @@ function resolveCollection (name) {
     case '@autopass/invite': return collection1
     case '@autopass/writer': return collection2
     case '@autopass/delete': return collection3
+    case '@autopass/del-invite': return collection4
     default: return null
   }
 }

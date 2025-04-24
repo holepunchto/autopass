@@ -80,6 +80,20 @@
           "version": 1
         }
       ]
+    },
+    {
+      "name": "del-invite",
+      "namespace": "autopass",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "id",
+          "required": true,
+          "type": "buffer",
+          "version": 1
+        }
+      ]
     }
   ]
 }

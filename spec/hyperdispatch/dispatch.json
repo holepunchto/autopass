@@ -30,6 +30,12 @@
       "name": "@autopass/add-invite",
       "requestType": "@autopass/invite",
       "version": 1
+    },
+    {
+      "id": 5,
+      "name": "@autopass/del-invite",
+      "requestType": "@autopass/del-invite",
+      "version": 1
     }
   ]
 }

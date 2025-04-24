@@ -99,6 +99,23 @@ const encoding3 = {
   }
 }
 
+// @autopass/del-invite
+const encoding4 = {
+  preencode (state, m) {
+    c.buffer.preencode(state, m.id)
+  },
+  encode (state, m) {
+    c.buffer.encode(state, m.id)
+  },
+  decode (state) {
+    const r0 = c.buffer.decode(state)
+
+    return {
+      id: r0
+    }
+  }
+}
+
 function setVersion (v) {
   version = v
 }
@@ -125,6 +142,7 @@ function getEncoding (name) {
     case '@autopass/writer': return encoding1
     case '@autopass/delete': return encoding2
     case '@autopass/invite': return encoding3
+    case '@autopass/del-invite': return encoding4
     default: throw new Error('Encoder not found ' + name)
   }
 }

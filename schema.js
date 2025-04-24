@@ -65,6 +65,17 @@ template.register({
   }
   ]
 })
+
+template.register({
+  name: 'del-invite',
+  compact: false,
+  fields: [{
+    name: 'id',
+    type: 'buffer',
+    required: true
+  }
+  ]
+})
 Hyperschema.toDisk(autopass)
 
 const dbTemplate = HyperdbBuilder.from('./spec/schema', './spec/db')
@@ -91,6 +102,12 @@ blobs.collections.register({
   key: ['key']
 })
 
+blobs.collections.register({
+  name: 'del-invite',
+  schema: '@autopass/del-invite',
+  key: ['id']
+})
+
 HyperdbBuilder.toDisk(dbTemplate)
 
 const hyperdispatch = Hyperdispatch.from('./spec/schema', './spec/hyperdispatch')
@@ -114,5 +131,9 @@ namespace.register({
 namespace.register(({
   name: 'add-invite',
   requestType: '@autopass/invite'
+}))
+namespace.register(({
+  name: 'del-invite',
+  requestType: '@autopass/del-invite'
 }))
 Hyperdispatch.toDisk(hyperdispatch)

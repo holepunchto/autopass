@@ -99,8 +99,25 @@ const encoding3 = {
   }
 }
 
-// @autopass/records/hyperdb#0
+// @autopass/del-invite
 const encoding4 = {
+  preencode (state, m) {
+    c.buffer.preencode(state, m.id)
+  },
+  encode (state, m) {
+    c.buffer.encode(state, m.id)
+  },
+  decode (state) {
+    const r0 = c.buffer.decode(state)
+
+    return {
+      id: r0
+    }
+  }
+}
+
+// @autopass/records/hyperdb#0
+const encoding5 = {
   preencode (state, m) {
     state.end++ // max flag is 1 so always one byte
 
@@ -124,7 +141,7 @@ const encoding4 = {
 }
 
 // @autopass/invite/hyperdb#1
-const encoding5 = {
+const encoding6 = {
   preencode (state, m) {
     c.buffer.preencode(state, m.invite)
     c.buffer.preencode(state, m.publicKey)
@@ -150,7 +167,7 @@ const encoding5 = {
 }
 
 // @autopass/writer/hyperdb#2
-const encoding6 = {
+const encoding7 = {
   preencode (state, m) {
 
   },
@@ -165,7 +182,22 @@ const encoding6 = {
 }
 
 // @autopass/delete/hyperdb#3
-const encoding7 = encoding6
+const encoding8 = encoding7
+
+// @autopass/del-invite/hyperdb#4
+const encoding9 = {
+  preencode (state, m) {
+
+  },
+  encode (state, m) {
+
+  },
+  decode (state) {
+    return {
+      id: null
+    }
+  }
+}
 
 function setVersion (v) {
   version = v
@@ -193,10 +225,12 @@ function getEncoding (name) {
     case '@autopass/writer': return encoding1
     case '@autopass/delete': return encoding2
     case '@autopass/invite': return encoding3
-    case '@autopass/records/hyperdb#0': return encoding4
-    case '@autopass/invite/hyperdb#1': return encoding5
-    case '@autopass/writer/hyperdb#2': return encoding6
-    case '@autopass/delete/hyperdb#3': return encoding7
+    case '@autopass/del-invite': return encoding4
+    case '@autopass/records/hyperdb#0': return encoding5
+    case '@autopass/invite/hyperdb#1': return encoding6
+    case '@autopass/writer/hyperdb#2': return encoding7
+    case '@autopass/delete/hyperdb#3': return encoding8
+    case '@autopass/del-invite/hyperdb#4': return encoding9
     default: throw new Error('Encoder not found ' + name)
   }
 }
