@@ -96,6 +96,10 @@ Get the local writer key.
 
 Get invite to add a writer.
 
+#### `await deleteInvite()`
+
+Delete the current invite.
+
 #### `await pass.ready()`
 
 Wait for the pass to load fully
