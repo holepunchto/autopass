@@ -1,6 +1,5 @@
 import Autopass from './index.js'
 import Corestore from 'corestore'
-
 const store = new Corestore('example/' + process.argv[2])
 
 let pass = null
@@ -17,10 +16,6 @@ if (pass.base.writable) {
   const inv = await pass.createInvite()
   console.log('invite', inv)
 }
-
-await pass.addFile('img-1', './studio.png')
-console.log(await pass.get('img-1'))
-
 onupdate()
 pass.on('update', onupdate)
 

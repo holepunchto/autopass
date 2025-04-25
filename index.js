@@ -292,8 +292,15 @@ class Autopass extends ReadyResource {
     if (fs.existsSync(path)) {
       const file = fs.readFileSync(path)
       await this.base.append(dispatch('@autopass/put', { key, file }))
-      console.log('added file')
     }
+  }
+
+  async getFile (key) {
+    const data = await this.base.view.get('@autopass/records', { key })
+    if (data === null) {
+      return null
+    }
+    return data.file
   }
 
   async remove (key) {
