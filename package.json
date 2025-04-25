@@ -8,6 +8,12 @@
   "author": "Holepunch Inc",
   "license": "Apache-2.0",
   "description": "",
+  "imports": {
+    "fs": {
+      "bare": "bare-fs",
+      "default": "fs"
+    }
+  },
   "devDependencies": {
     "brittle": "^3.7.0",
     "hyperdht": "^6.20.1",
@@ -16,10 +22,11 @@
   },
   "dependencies": {
     "autobase": "^7.0.34",
-    "corestore": "^7.0.7",
     "b4a": "^1.6.7",
+    "bare-fs": "^4.1.2",
     "blind-pairing": "^2.3.1",
     "compact-encoding": "^2.16.0",
+    "corestore": "^7.0.7",
     "hyperbee": "^2.22.2",
     "hypercore": "^11.0.9",
     "hyperdb": "^4.9.4",

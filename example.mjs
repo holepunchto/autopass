@@ -18,6 +18,9 @@ if (pass.base.writable) {
   console.log('invite', inv)
 }
 
+await pass.addFile('img-1', './studio.png')
+console.log(await pass.get('img-1'))
+
 onupdate()
 pass.on('update', onupdate)
 

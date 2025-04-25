@@ -9,6 +9,7 @@ const z32 = require('z32')
 const b4a = require('b4a')
 const { Router, dispatch } = require('./spec/hyperdispatch')
 const db = require('./spec/db/index.js')
+const fs = require('fs')
 
 class AutopassPairer extends ReadyResource {
   constructor (store, invite, opts = {}) {
@@ -285,6 +286,14 @@ class Autopass extends ReadyResource {
 
   async add (key, value) {
     await this.base.append(dispatch('@autopass/put', { key, value }))
+  }
+
+  async addFile (key, path) {
+    if (fs.existsSync(path)) {
+      const file = fs.readFileSync(path)
+      await this.base.append(dispatch('@autopass/put', { key, file }))
+      console.log('added file')
+    }
   }
 
   async remove (key) {

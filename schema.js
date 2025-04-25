@@ -17,6 +17,10 @@ template.register({
     name: 'value',
     type: 'string',
     required: false
+  }, {
+    name: 'file',
+    type: 'buffer',
+    required: false
   }
   ]
 })
