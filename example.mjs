@@ -1,5 +1,6 @@
 import Autopass from './index.js'
 import Corestore from 'corestore'
+import process from 'process'
 const store = new Corestore('example/' + process.argv[2])
 
 let pass = null
