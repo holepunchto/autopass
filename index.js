@@ -135,6 +135,10 @@ class Autopass extends ReadyResource {
       await context.view.insert('@autopass/invite', data)
     })
 
+    this.router.add('@autopass/del-invite', async (data, context) => {
+      await context.view.delete('@autopass/invite', { id: data.id })
+    })
+
     this._boot(opts)
     this.ready().catch(noop)
   }
@@ -215,6 +219,14 @@ class Autopass extends ReadyResource {
     return z32.encode(record.invite)
   }
 
+  async deleteInvite () {
+    if (this.opened === false) await this.ready()
+    const existing = await this.base.view.findOne('@autopass/invite', {})
+    if (existing) {
+      await this.base.append(dispatch('@autopass/del-invite', existing))
+    }
+  }
+
   list (opts) {
     return this.base.view.find('@autopass/records', {})
   }
@@ -273,6 +285,18 @@ class Autopass extends ReadyResource {
 
   async add (key, value) {
     await this.base.append(dispatch('@autopass/put', { key, value }))
+  }
+
+  async addFile (key, file) {
+    await this.base.append(dispatch('@autopass/put', { key, file }))
+  }
+
+  async getFile (key) {
+    const data = await this.base.view.get('@autopass/records', { key })
+    if (data === null) {
+      return null
+    }
+    return data.file
   }
 
   async remove (key) {

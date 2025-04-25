@@ -53,6 +53,19 @@
         "key"
       ],
       "trigger": null
+    },
+    {
+      "name": "del-invite",
+      "namespace": "autopass",
+      "id": 4,
+      "type": 1,
+      "indexes": [],
+      "schema": "@autopass/del-invite",
+      "derived": false,
+      "key": [
+        "id"
+      ],
+      "trigger": null
     }
   ]
 }

@@ -13,8 +13,9 @@ class Router {
     this._handler2 = null
     this._handler3 = null
     this._handler4 = null
+    this._handler5 = null
 
-    this._missing = 5
+    this._missing = 6
   }
 
   add (name, handler) {
@@ -34,6 +35,9 @@ class Router {
       case '@autopass/add-invite':
         this._handler4 = handler
         break
+      case '@autopass/del-invite':
+        this._handler5 = handler
+        break
       default:
         throw new Error('Cannot register a handler for a nonexistent route: ' + name)
     }
@@ -46,6 +50,7 @@ class Router {
     assert(this._handler2 !== null, 'Missing handler for "@autopass/put"')
     assert(this._handler3 !== null, 'Missing handler for "@autopass/del"')
     assert(this._handler4 !== null, 'Missing handler for "@autopass/add-invite"')
+    assert(this._handler5 !== null, 'Missing handler for "@autopass/del-invite"')
   }
 
   async dispatch (encoded, context) {
@@ -69,6 +74,8 @@ class Router {
         return this._handler3(route3.enc.decode(state), context)
       case 4:
         return this._handler4(route4.enc.decode(state), context)
+      case 5:
+        return this._handler5(route5.enc.decode(state), context)
       default:
         throw new Error('Handler not found for ID:' + id)
     }
@@ -116,6 +123,11 @@ const route4 = {
   enc: getEncoding('@autopass/invite')
 }
 
+const route5 = {
+  id: 5,
+  enc: getEncoding('@autopass/del-invite')
+}
+
 function getEncoderAndId (name) {
   switch (name) {
     case '@autopass/remove-writer':
@@ -128,6 +140,8 @@ function getEncoderAndId (name) {
       return route3
     case '@autopass/add-invite':
       return route4
+    case '@autopass/del-invite':
+      return route5
     default:
       throw new Error('Handler not found for name: ' + name)
   }

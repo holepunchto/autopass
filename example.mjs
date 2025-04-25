@@ -1,6 +1,6 @@
 import Autopass from './index.js'
 import Corestore from 'corestore'
-
+import process from 'process'
 const store = new Corestore('example/' + process.argv[2])
 
 let pass = null
@@ -17,7 +17,6 @@ if (pass.base.writable) {
   const inv = await pass.createInvite()
   console.log('invite', inv)
 }
-
 onupdate()
 pass.on('update', onupdate)
 

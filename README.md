@@ -59,6 +59,10 @@ Triggered when it updates, ie something added/removed an entry
 
 Get an entry.
 
+#### `value = await pass.getFile(name)`
+
+Get a file.
+
 #### `stream = pass.list()`
 
 Get all entries.
@@ -66,6 +70,11 @@ Get all entries.
 #### `await pass.add(key, value)`
 
 Add new entry
+
+#### `await pass.addFIle(name, buffer)`
+
+Add new file
+
 
 #### `await pass.remove(key)`
 
@@ -86,6 +95,10 @@ Get the local writer key.
 #### `inv = await pass.createInvite()`
 
 Get invite to add a writer.
+
+#### `await deleteInvite()`
+
+Delete the current invite.
 
 #### `await pass.ready()`
 
