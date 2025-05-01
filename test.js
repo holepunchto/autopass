@@ -23,7 +23,6 @@ test('invites', async function (t) {
   const a = await create(t, { bootstrap: tn.bootstrap })
   t.teardown(() => {
     a.close()
-
   })
 
   const onUpdate = function () {
@@ -31,8 +30,6 @@ test('invites', async function (t) {
       t.pass('a has two members')
       a.removeListener('update', onUpdate)
     }
-
-
   }
 
   a.on('update', onUpdate)
@@ -64,7 +61,6 @@ test('invites', async function (t) {
     if (a.base.system.members === 2) {
       t.pass('a has two members')
       a.removeListener('update', updateListener) // Remove the listener in teardown
-
     }
   }
 
