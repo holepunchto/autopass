@@ -54,6 +54,8 @@ class AutopassPairer extends ReadyResource {
             encryptionKey: result.encryptionKey,
             bootstrap: this.bootstrap
           })
+
+          await this.pass.deleteInvite()
         }
         this.swarm = null
         this.store = null
@@ -278,6 +280,7 @@ class Autopass extends ReadyResource {
           key: this.base.key,
           encryptionKey: this.base.encryptionKey
         })
+        await this.deleteInvite()
       }
     })
     this.swarm.join(this.base.discoveryKey)
