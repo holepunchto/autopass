@@ -120,6 +120,14 @@ Force close the pair instance. Only need to call this if you dont wait for it to
 
 Fully close the pass instance.
 
+#### `await pass.suspend()`
+
+Suspend the swarm and discovery
+
+#### `await pass.resume`
+
+Resume the swarm is suspended
+
 ## Contributors
 
 Written with big contributions from [@supersu](https://github.com/supersuryaansh)
