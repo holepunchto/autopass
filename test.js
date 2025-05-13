@@ -75,6 +75,53 @@ test('invites', async function (t) {
   })
 })
 
+test('suspend and resume', async function (t) {
+  t.plan(3)
+
+  const tn = await testnet(2, t)
+
+  const a = await create(t, { bootstrap: tn.bootstrap })
+  const inv = await a.createInvite()
+  t.teardown(() => a.close())
+
+  const p = await pair(t, inv, { bootstrap: tn.bootstrap })
+  const b = await p.finished()
+  await b.ready()
+  t.teardown(() => b.close())
+
+  await new Promise((resolve) => {
+    const check = () => {
+      if (a.swarm.peers.size > 0 && b.swarm.peers.size > 0) {
+        resolve()
+      } else {
+        setTimeout(check, 100)
+      }
+    }
+    check()
+  })
+
+  t.ok(a.swarm.peers.size > 0, 'a has peers before suspend')
+
+  await a.suspend()
+
+  t.is(a.swarm.peers.size, 0, 'a has 0 peers after suspend')
+
+  await a.resume()
+
+  await new Promise((resolve) => {
+    const check = () => {
+      if (a.swarm.peers.size > 0) {
+        resolve()
+      } else {
+        setTimeout(check, 100)
+      }
+    }
+    check()
+  })
+
+  t.ok(a.swarm.peers.size > 0, 'a has peers after resume')
+})
+
 async function create (t, opts) {
   const dir = await tmp(t)
   const a = new Autopass(new Corestore(dir), opts)
