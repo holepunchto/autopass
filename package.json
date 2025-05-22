@@ -25,19 +25,20 @@
     "test-tmp": "^1.3.0"
   },
   "dependencies": {
-    "autobase": "^7.0.34",
+    "@holepunchto/blind-peering": "^1.6.4",
+    "autobase": "^7.7.0",
     "b4a": "^1.6.7",
-    "bare-fs": "^4.1.2",
+    "bare-fs": "^4.1.5",
     "bare-process": "^4.2.1",
     "blind-pairing": "^2.3.1",
     "compact-encoding": "^2.16.0",
-    "corestore": "^7.0.7",
-    "hyperbee": "^2.22.2",
-    "hypercore": "^11.0.9",
-    "hyperdb": "^4.9.4",
-    "hyperdispatch": "^1.0.2",
-    "hyperschema": "^1.10.4",
-    "hyperswarm": "^4.8.4",
-    "ready-resource": "^1.1.1"
+    "corestore": "^7.4.2",
+    "hyperbee": "^2.24.2",
+    "hypercore": "^11.8.0",
+    "hyperdb": "^4.13.1",
+    "hyperdispatch": "^1.2.0",
+    "hyperschema": "^1.12.1",
+    "hyperswarm": "^4.11.7",
+    "ready-resource": "^1.1.2"
   }
 }
