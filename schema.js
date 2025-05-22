@@ -28,10 +28,6 @@ template.register({
   name: 'mirrors',
   compact: false,
   fields: [{
-    name: 'name',
-    type: 'string',
-    required: true
-  }, {
     name: 'key',
     type: 'string',
     required: true
@@ -97,7 +93,7 @@ template.register({
   name: 'del-mirror',
   compact: false,
   fields: [{
-    name: 'name',
+    name: 'key',
     type: 'string',
     required: true
   }
@@ -120,7 +116,7 @@ blobs.collections.register({
 blobs.collections.register({
   name: 'mirrors',
   schema: '@autopass/mirrors',
-  key: ['name']
+  key: ['key']
 })
 blobs.collections.register({
   name: 'writer',
@@ -142,7 +138,7 @@ blobs.collections.register({
 blobs.collections.register({
   name: 'del-mirror',
   schema: '@autopass/del-mirror',
-  key: ['name']
+  key: ['key']
 })
 HyperdbBuilder.toDisk(dbTemplate)
 

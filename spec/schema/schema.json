@@ -34,12 +34,6 @@
       "flagsPosition": -1,
       "fields": [
         {
-          "name": "name",
-          "required": true,
-          "type": "string",
-          "version": 1
-        },
-        {
           "name": "key",
           "required": true,
           "type": "string",
@@ -128,7 +122,7 @@
       "flagsPosition": -1,
       "fields": [
         {
-          "name": "name",
+          "name": "key",
           "required": true,
           "type": "string",
           "version": 1

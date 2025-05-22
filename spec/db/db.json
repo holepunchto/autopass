@@ -37,7 +37,7 @@
       "schema": "@autopass/mirrors",
       "derived": false,
       "key": [
-        "name"
+        "key"
       ],
       "trigger": null
     },
@@ -89,7 +89,7 @@
       "schema": "@autopass/del-mirror",
       "derived": false,
       "key": [
-        "name"
+        "key"
       ],
       "trigger": null
     }

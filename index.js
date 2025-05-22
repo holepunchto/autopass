@@ -138,7 +138,7 @@ class Autopass extends ReadyResource {
     })
 
     this.router.add('@autopass/del-mirror', async (data, context) => {
-      await context.view.delete('@autopass/mirrors', { name: data.name })
+      await context.view.delete('@autopass/mirrors', { key: data.key })
     })
 
     this.router.add('@autopass/add-invite', async (data, context) => {
@@ -314,8 +314,8 @@ class Autopass extends ReadyResource {
     return data.file
   }
 
-  async addMirror (name, key) {
-    await this.base.append(encode('@autopass/add-mirror', { name, key }))
+  async addMirror (key) {
+    await this.base.append(encode('@autopass/add-mirror', { key }))
   }
 
   async getMirror () {
@@ -323,8 +323,8 @@ class Autopass extends ReadyResource {
     return await queryStream.toArray()
   }
 
-  async removeMirror (name) {
-    await this.base.append(encode('@autopass/del-mirror', { name }))
+  async removeMirror (key) {
+    await this.base.append(encode('@autopass/del-mirror', { key }))
   }
 
   async remove (key) {

@@ -120,7 +120,7 @@ const collection2_key = new IndexEncoder([
 ], { prefix: 2 })
 
 function collection2_indexify (record) {
-  const a = record.name
+  const a = record.key
   return a === undefined ? [] : [a]
 }
 
@@ -132,14 +132,14 @@ function collection2_reconstruct (version, keyBuf, valueBuf) {
   const key = collection2_key.decode(keyBuf)
   setVersion(version)
   const record = c.decode(collection2_enc, valueBuf)
-  record.name = key[0]
+  record.key = key[0]
   return record
 }
 // '@autopass/mirrors' key reconstruction function
 function collection2_reconstruct_key (keyBuf) {
   const key = collection2_key.decode(keyBuf)
   return {
-    name: key[0]
+    key: key[0]
   }
 }
 
@@ -148,7 +148,7 @@ const collection2 = {
   name: '@autopass/mirrors',
   id: 2,
   encodeKey (record) {
-    const key = [record.name]
+    const key = [record.key]
     return collection2_key.encode(key)
   },
   encodeKeyRange ({ gt, lt, gte, lte } = {}) {
@@ -340,7 +340,7 @@ const collection6_key = new IndexEncoder([
 ], { prefix: 6 })
 
 function collection6_indexify (record) {
-  const a = record.name
+  const a = record.key
   return a === undefined ? [] : [a]
 }
 
@@ -352,14 +352,14 @@ function collection6_reconstruct (version, keyBuf, valueBuf) {
   const key = collection6_key.decode(keyBuf)
   setVersion(version)
   const record = c.decode(collection6_enc, valueBuf)
-  record.name = key[0]
+  record.key = key[0]
   return record
 }
 // '@autopass/del-mirror' key reconstruction function
 function collection6_reconstruct_key (keyBuf) {
   const key = collection6_key.decode(keyBuf)
   return {
-    name: key[0]
+    key: key[0]
   }
 }
 
@@ -368,7 +368,7 @@ const collection6 = {
   name: '@autopass/del-mirror',
   id: 6,
   encodeKey (record) {
-    const key = [record.name]
+    const key = [record.key]
     return collection6_key.encode(key)
   },
   encodeKeyRange ({ gt, lt, gte, lte } = {}) {

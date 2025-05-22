@@ -45,20 +45,16 @@ const encoding0 = {
 // @autopass/mirrors
 const encoding1 = {
   preencode (state, m) {
-    c.string.preencode(state, m.name)
     c.string.preencode(state, m.key)
   },
   encode (state, m) {
-    c.string.encode(state, m.name)
     c.string.encode(state, m.key)
   },
   decode (state) {
     const r0 = c.string.decode(state)
-    const r1 = c.string.decode(state)
 
     return {
-      name: r0,
-      key: r1
+      key: r0
     }
   }
 }
@@ -81,21 +77,7 @@ const encoding2 = {
 }
 
 // @autopass/delete
-const encoding3 = {
-  preencode (state, m) {
-    c.string.preencode(state, m.key)
-  },
-  encode (state, m) {
-    c.string.encode(state, m.key)
-  },
-  decode (state) {
-    const r0 = c.string.decode(state)
-
-    return {
-      key: r0
-    }
-  }
-}
+const encoding3 = encoding1
 
 // @autopass/invite
 const encoding4 = {
@@ -144,21 +126,7 @@ const encoding5 = {
 }
 
 // @autopass/del-mirror
-const encoding6 = {
-  preencode (state, m) {
-    c.string.preencode(state, m.name)
-  },
-  encode (state, m) {
-    c.string.encode(state, m.name)
-  },
-  decode (state) {
-    const r0 = c.string.decode(state)
-
-    return {
-      name: r0
-    }
-  }
-}
+const encoding6 = encoding1
 
 // @autopass/records/hyperdb#0
 const encoding7 = {
@@ -218,24 +186,6 @@ const encoding8 = {
 // @autopass/mirrors/hyperdb#2
 const encoding9 = {
   preencode (state, m) {
-    c.string.preencode(state, m.key)
-  },
-  encode (state, m) {
-    c.string.encode(state, m.key)
-  },
-  decode (state) {
-    const r1 = c.string.decode(state)
-
-    return {
-      name: null,
-      key: r1
-    }
-  }
-}
-
-// @autopass/writer/hyperdb#3
-const encoding10 = {
-  preencode (state, m) {
 
   },
   encode (state, m) {
@@ -248,8 +198,11 @@ const encoding10 = {
   }
 }
 
+// @autopass/writer/hyperdb#3
+const encoding10 = encoding9
+
 // @autopass/delete/hyperdb#4
-const encoding11 = encoding10
+const encoding11 = encoding9
 
 // @autopass/del-invite/hyperdb#5
 const encoding12 = {
@@ -267,19 +220,7 @@ const encoding12 = {
 }
 
 // @autopass/del-mirror/hyperdb#6
-const encoding13 = {
-  preencode (state, m) {
-
-  },
-  encode (state, m) {
-
-  },
-  decode (state) {
-    return {
-      name: null
-    }
-  }
-}
+const encoding13 = encoding9
 
 function setVersion (v) {
   version = v
