@@ -24,3 +24,11 @@ function onupdate () {
   console.log('db changed, all entries:')
   pass.list().on('data', console.log)
 }
+
+await pass.addMirror('1', '1jo34mt6565uabaiofn69fu8i6w61qipeyeyqgp9y')
+
+await pass.addMirror('2', '1jo34mt6565uabaiofn69fu8i6w61qipeyeyqgp9y')
+console.log(await pass.getMirror())
+await pass.removeMirror('2')
+
+console.log(await pass.getMirror())

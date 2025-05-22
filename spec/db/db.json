@@ -29,9 +29,22 @@
       "trigger": null
     },
     {
-      "name": "writer",
+      "name": "mirrors",
       "namespace": "autopass",
       "id": 2,
+      "type": 1,
+      "indexes": [],
+      "schema": "@autopass/mirrors",
+      "derived": false,
+      "key": [
+        "name"
+      ],
+      "trigger": null
+    },
+    {
+      "name": "writer",
+      "namespace": "autopass",
+      "id": 3,
       "type": 1,
       "indexes": [],
       "schema": "@autopass/writer",
@@ -44,7 +57,7 @@
     {
       "name": "delete",
       "namespace": "autopass",
-      "id": 3,
+      "id": 4,
       "type": 1,
       "indexes": [],
       "schema": "@autopass/delete",
@@ -57,13 +70,26 @@
     {
       "name": "del-invite",
       "namespace": "autopass",
-      "id": 4,
+      "id": 5,
       "type": 1,
       "indexes": [],
       "schema": "@autopass/del-invite",
       "derived": false,
       "key": [
         "id"
+      ],
+      "trigger": null
+    },
+    {
+      "name": "del-mirror",
+      "namespace": "autopass",
+      "id": 6,
+      "type": 1,
+      "indexes": [],
+      "schema": "@autopass/del-mirror",
+      "derived": false,
+      "key": [
+        "name"
       ],
       "trigger": null
     }
