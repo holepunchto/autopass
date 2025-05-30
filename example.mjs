@@ -24,3 +24,4 @@ function onupdate () {
   console.log('db changed, all entries:')
   pass.list().on('data', console.log)
 }
+
