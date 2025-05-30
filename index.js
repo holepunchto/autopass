@@ -43,6 +43,11 @@ class AutopassPairer extends ReadyResource {
     this.pairing = new BlindPairing(this.swarm)
     const core = Autobase.getLocalCore(this.store)
     await core.ready()
+
+    const mirrors = []
+    const peering = new BlindPeering(this.swarm, this.store, { autobaseMirrors: mirrors, mirrors, coreMirrors: mirrors })
+    peering.addCoreBackground((core), { announce: true })
+
     const key = core.key
     await core.close()
     this.candidate = this.pairing.addCandidate({
@@ -122,7 +127,9 @@ class Autopass extends ReadyResource {
     })
 
     this.router.add('@autopass/add-writer', async (data, context) => {
-      await context.base.addWriter(data.key)
+      // TODO: Verify user before calling addWriter
+      const indexer = context.seq === 0 && context.writer.equals(context.base.key)
+      await context.base.addWriter(data.key, { isIndexer: indexer })
     })
 
     this.router.add('@autopass/put', async (data, context) => {
@@ -160,6 +167,7 @@ class Autopass extends ReadyResource {
     this.base = new Autobase(this.store, key, {
       encrypt: true,
       encryptionKey,
+      optimistic: true,
       open (store) {
         return HyperDB.bee(store.get('view'), db, {
           extension: false,
@@ -177,7 +185,7 @@ class Autopass extends ReadyResource {
 
   async _apply (nodes, view, base) {
     for (const node of nodes) {
-      await this.router.dispatch(node.value, { view, base })
+      await this.router.dispatch(node.value, { writer: node.from.key, seq: node.length - 1, view, base })
     }
     await view.flush()
   }
@@ -250,7 +258,7 @@ class Autopass extends ReadyResource {
   }
 
   async addWriter (key) {
-    await this.base.append(encode('@autopass/add-writer', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
+    await this.base.append(encode('@autopass/add-writer', { key: b4a.isBuffer(key) ? key : b4a.from(key) }), { optimistic: true })
     return true
   }
 
@@ -294,8 +302,9 @@ class Autopass extends ReadyResource {
 
     const mirrorList = await this.getMirror()
     const mirrors = mirrorList.map(item => item.key)
-    this.peering = new BlindPeering(this.swarm, this.store, { autobaseMirrors: mirrors })
-    this.peering.addAutobaseBackground(this.base)
+
+    this.peering = new BlindPeering(this.swarm, this.store, { autobaseMirrors: mirrors, mirrors, coreMirrors: mirrors })
+    this.peering.addCoreBackground(this.base.view.core, this.base.view.core.key, { announce: true })
   }
 
   async add (key, value) {

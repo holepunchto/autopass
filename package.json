@@ -39,6 +39,7 @@
     "hyperdispatch": "^1.2.0",
     "hyperschema": "^1.12.1",
     "hyperswarm": "^4.11.7",
+    "protomux-wakeup": "^2.4.3",
     "ready-resource": "^1.1.2"
   }
 }
