@@ -71,7 +71,7 @@ Get all entries.
 
 Add new entry
 
-#### `await pass.addFIle(name, buffer)`
+#### `await pass.addFile(name, buffer)`
 
 Add new file
 
