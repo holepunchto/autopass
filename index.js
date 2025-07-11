@@ -307,11 +307,13 @@ class Autopass extends ReadyResource {
     if (this.swarm) {
       await this.pairing.suspend()
       await this.swarm.suspend()
+      await this.store.suspend()
     }
   }
 
   async resume () {
     if (this.swarm) {
+      await this.store.resume()
       await this.swarm.resume()
       await this.pairing.resume()
     }
