@@ -269,7 +269,7 @@ class Autopass extends ReadyResource {
       onadd: async (candidate) => {
         const id = candidate.inviteId
         const inv = await this.base.view.findOne('@autopass/invite', {})
-        if (!b4a.equals(inv.id, id)) {
+        if (inv === null || !b4a.equals(inv.id, id)) {
           return
         }
         candidate.open(inv.publicKey)
