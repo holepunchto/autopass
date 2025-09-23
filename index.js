@@ -11,7 +11,7 @@ const { Router, dispatch } = require('./spec/hyperdispatch')
 const db = require('./spec/db/index.js')
 
 class AutopassPairer extends ReadyResource {
-  constructor (store, invite, opts = {}) {
+  constructor(store, invite, opts = {}) {
     super()
     this.store = store
     this.invite = invite
@@ -26,7 +26,7 @@ class AutopassPairer extends ReadyResource {
     this.ready().catch(noop)
   }
 
-  async _open () {
+  async _open() {
     await this.store.ready()
     this.swarm = new Hyperswarm({
       keyPair: await this.store.createKeyPair('hyperswarm'),
@@ -63,7 +63,7 @@ class AutopassPairer extends ReadyResource {
     })
   }
 
-  _whenWritable () {
+  _whenWritable() {
     if (this.pass.base.writable) return
     const check = () => {
       if (this.pass.base.writable) {
@@ -74,7 +74,7 @@ class AutopassPairer extends ReadyResource {
     this.pass.base.on('update', check)
   }
 
-  async _close () {
+  async _close() {
     if (this.candidate !== null) {
       await this.candidate.close()
     }
@@ -94,7 +94,7 @@ class AutopassPairer extends ReadyResource {
     }
   }
 
-  finished () {
+  finished() {
     return new Promise((resolve, reject) => {
       this.onresolve = resolve
       this.onreject = reject
@@ -103,7 +103,7 @@ class AutopassPairer extends ReadyResource {
 }
 
 class Autopass extends ReadyResource {
-  constructor (corestore, opts = {}) {
+  constructor(corestore, opts = {}) {
     super()
     this.router = new Router()
     this.store = corestore
@@ -144,13 +144,13 @@ class Autopass extends ReadyResource {
   }
 
   // Initialize autobase
-  _boot (opts = {}) {
+  _boot(opts = {}) {
     const { encryptionKey, key } = opts
 
     this.base = new Autobase(this.store, key, {
       encrypt: true,
       encryptionKey,
-      open (store) {
+      open(store) {
         return HyperDB.bee(store.get('view'), db, {
           extension: false,
           autoUpdate: true
@@ -165,19 +165,19 @@ class Autopass extends ReadyResource {
     })
   }
 
-  async _apply (nodes, view, base) {
+  async _apply(nodes, view, base) {
     for (const node of nodes) {
       await this.router.dispatch(node.value, { view, base })
     }
     await view.flush()
   }
 
-  async _open () {
+  async _open() {
     await this.base.ready()
     if (this.replicate) await this._replicate()
   }
 
-  async _close () {
+  async _close() {
     if (this.swarm) {
       await this.member.close()
       await this.pairing.close()
@@ -186,40 +186,42 @@ class Autopass extends ReadyResource {
     await this.base.close()
   }
 
-  get writerKey () {
+  get writerKey() {
     return this.base.local.key
   }
 
-  get key () {
+  get key() {
     return this.base.key
   }
 
-  get discoveryKey () {
+  get discoveryKey() {
     return this.base.discoveryKey
   }
 
-  get encryptionKey () {
+  get encryptionKey() {
     return this.base.encryptionKey
   }
 
-  static pair (store, invite, opts) {
+  static pair(store, invite, opts) {
     return new AutopassPairer(store, invite, opts)
   }
 
-  async createInvite (opts) {
+  async createInvite(opts) {
     if (this.opened === false) await this.ready()
     const existing = await this.base.view.findOne('@autopass/invite', {})
     if (existing) {
       return z32.encode(existing.invite)
     }
-    const { id, invite, publicKey, expires } = BlindPairing.createInvite(this.base.key)
+    const { id, invite, publicKey, expires } = BlindPairing.createInvite(
+      this.base.key
+    )
 
     const record = { id, invite, publicKey, expires }
     await this.base.append(dispatch('@autopass/add-invite', record))
     return z32.encode(record.invite)
   }
 
-  async deleteInvite () {
+  async deleteInvite() {
     if (this.opened === false) await this.ready()
     const existing = await this.base.view.findOne('@autopass/invite', {})
     if (existing) {
@@ -227,11 +229,11 @@ class Autopass extends ReadyResource {
     }
   }
 
-  list (opts) {
+  list(opts) {
     return this.base.view.find('@autopass/records', {})
   }
 
-  async get (key) {
+  async get(key) {
     const data = await this.base.view.get('@autopass/records', { key })
     if (data === null) {
       return null
@@ -239,20 +241,28 @@ class Autopass extends ReadyResource {
     return data.value
   }
 
-  async addWriter (key) {
-    await this.base.append(dispatch('@autopass/add-writer', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
+  async addWriter(key) {
+    await this.base.append(
+      dispatch('@autopass/add-writer', {
+        key: b4a.isBuffer(key) ? key : b4a.from(key)
+      })
+    )
     return true
   }
 
-  async removeWriter (key) {
-    await this.base.append(dispatch('@autopass/remove-writer', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
+  async removeWriter(key) {
+    await this.base.append(
+      dispatch('@autopass/remove-writer', {
+        key: b4a.isBuffer(key) ? key : b4a.from(key)
+      })
+    )
   }
 
-  get writable () {
+  get writable() {
     return this.base.writable
   }
 
-  async _replicate () {
+  async _replicate() {
     await this.base.ready()
     if (this.swarm === null) {
       this.swarm = new Hyperswarm({
@@ -283,15 +293,15 @@ class Autopass extends ReadyResource {
     this.swarm.join(this.base.discoveryKey)
   }
 
-  async add (key, value) {
+  async add(key, value) {
     await this.base.append(dispatch('@autopass/put', { key, value }))
   }
 
-  async addFile (key, file) {
+  async addFile(key, file) {
     await this.base.append(dispatch('@autopass/put', { key, file }))
   }
 
-  async getFile (key) {
+  async getFile(key) {
     const data = await this.base.view.get('@autopass/records', { key })
     if (data === null) {
       return null
@@ -299,11 +309,11 @@ class Autopass extends ReadyResource {
     return data.file
   }
 
-  async remove (key) {
+  async remove(key) {
     await this.base.append(dispatch('@autopass/del', { key }))
   }
 } // end class
 
-function noop () {}
+function noop() {}
 
 module.exports = Autopass

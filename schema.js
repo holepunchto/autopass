@@ -9,75 +9,85 @@ const template = autopass.namespace('autopass')
 template.register({
   name: 'records',
   compact: false,
-  fields: [{
-    name: 'key',
-    type: 'string',
-    required: true
-  }, {
-    name: 'value',
-    type: 'string',
-    required: false
-  }, {
-    name: 'file',
-    type: 'buffer',
-    required: false
-  }
+  fields: [
+    {
+      name: 'key',
+      type: 'string',
+      required: true
+    },
+    {
+      name: 'value',
+      type: 'string',
+      required: false
+    },
+    {
+      name: 'file',
+      type: 'buffer',
+      required: false
+    }
   ]
 })
 
 template.register({
   name: 'writer',
   compact: false,
-  fields: [{
-    name: 'key',
-    type: 'buffer',
-    required: true
-  }
+  fields: [
+    {
+      name: 'key',
+      type: 'buffer',
+      required: true
+    }
   ]
 })
 
 template.register({
   name: 'delete',
   compact: false,
-  fields: [{
-    name: 'key',
-    type: 'string',
-    required: true
-  }
+  fields: [
+    {
+      name: 'key',
+      type: 'string',
+      required: true
+    }
   ]
 })
 
 template.register({
   name: 'invite',
   compact: false,
-  fields: [{
-    name: 'id',
-    type: 'buffer',
-    required: true
-  }, {
-    name: 'invite',
-    type: 'buffer',
-    required: true
-  }, {
-    name: 'publicKey',
-    type: 'buffer',
-    required: true
-  }, {
-    name: 'expires',
-    type: 'int',
-    required: true
-  }
+  fields: [
+    {
+      name: 'id',
+      type: 'buffer',
+      required: true
+    },
+    {
+      name: 'invite',
+      type: 'buffer',
+      required: true
+    },
+    {
+      name: 'publicKey',
+      type: 'buffer',
+      required: true
+    },
+    {
+      name: 'expires',
+      type: 'int',
+      required: true
+    }
   ]
 })
 
 template.register({
   name: 'del-invite',
   compact: false,
-  fields: [{
-    name: 'id',
-    type: 'buffer',
-    required: true
-  }
+  fields: [
+    {
+      name: 'id',
+      type: 'buffer',
+      required: true
+    }
   ]
 })
 Hyperschema.toDisk(autopass)
@@ -114,7 +124,10 @@ blobs.collections.register({
 
 HyperdbBuilder.toDisk(dbTemplate)
 
-const hyperdispatch = Hyperdispatch.from('./spec/schema', './spec/hyperdispatch')
+const hyperdispatch = Hyperdispatch.from(
+  './spec/schema',
+  './spec/hyperdispatch'
+)
 const namespace = hyperdispatch.namespace('autopass')
 namespace.register({
   name: 'remove-writer',
@@ -132,12 +145,12 @@ namespace.register({
   name: 'del',
   requestType: '@autopass/delete'
 })
-namespace.register(({
+namespace.register({
   name: 'add-invite',
   requestType: '@autopass/invite'
-}))
-namespace.register(({
+})
+namespace.register({
   name: 'del-invite',
   requestType: '@autopass/del-invite'
-}))
+})
 Hyperdispatch.toDisk(hyperdispatch)

@@ -10,9 +10,7 @@
       "indexes": [],
       "schema": "@autopass/records",
       "derived": false,
-      "key": [
-        "key"
-      ],
+      "key": ["key"],
       "trigger": null
     },
     {
@@ -23,9 +21,7 @@
       "indexes": [],
       "schema": "@autopass/invite",
       "derived": false,
-      "key": [
-        "id"
-      ],
+      "key": ["id"],
       "trigger": null
     },
     {
@@ -36,9 +32,7 @@
       "indexes": [],
       "schema": "@autopass/writer",
       "derived": false,
-      "key": [
-        "key"
-      ],
+      "key": ["key"],
       "trigger": null
     },
     {
@@ -49,9 +43,7 @@
       "indexes": [],
       "schema": "@autopass/delete",
       "derived": false,
-      "key": [
-        "key"
-      ],
+      "key": ["key"],
       "trigger": null
     },
     {
@@ -62,9 +54,7 @@
       "indexes": [],
       "schema": "@autopass/del-invite",
       "derived": false,
-      "key": [
-        "id"
-      ],
+      "key": ["id"],
       "trigger": null
     }
   ]

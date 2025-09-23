@@ -7,7 +7,7 @@ const { version, getEncoding, setVersion } = require('./messages.js')
 const defaultVersion = version
 
 class Router {
-  constructor () {
+  constructor() {
     this._handler0 = null
     this._handler1 = null
     this._handler2 = null
@@ -18,7 +18,7 @@ class Router {
     this._missing = 6
   }
 
-  add (name, handler) {
+  add(name, handler) {
     switch (name) {
       case '@autopass/remove-writer':
         this._handler0 = handler
@@ -39,21 +39,35 @@ class Router {
         this._handler5 = handler
         break
       default:
-        throw new Error('Cannot register a handler for a nonexistent route: ' + name)
+        throw new Error(
+          'Cannot register a handler for a nonexistent route: ' + name
+        )
     }
     this._missing--
   }
 
-  _checkAll () {
-    assert(this._handler0 !== null, 'Missing handler for "@autopass/remove-writer"')
-    assert(this._handler1 !== null, 'Missing handler for "@autopass/add-writer"')
+  _checkAll() {
+    assert(
+      this._handler0 !== null,
+      'Missing handler for "@autopass/remove-writer"'
+    )
+    assert(
+      this._handler1 !== null,
+      'Missing handler for "@autopass/add-writer"'
+    )
     assert(this._handler2 !== null, 'Missing handler for "@autopass/put"')
     assert(this._handler3 !== null, 'Missing handler for "@autopass/del"')
-    assert(this._handler4 !== null, 'Missing handler for "@autopass/add-invite"')
-    assert(this._handler5 !== null, 'Missing handler for "@autopass/del-invite"')
+    assert(
+      this._handler4 !== null,
+      'Missing handler for "@autopass/add-invite"'
+    )
+    assert(
+      this._handler5 !== null,
+      'Missing handler for "@autopass/del-invite"'
+    )
   }
 
-  async dispatch (encoded, context) {
+  async dispatch(encoded, context) {
     if (this._missing > 0) {
       this._checkAll()
     }
@@ -82,7 +96,7 @@ class Router {
   }
 }
 
-function dispatch (name, message, { version = defaultVersion } = {}) {
+function dispatch(name, message, { version = defaultVersion } = {}) {
   const state = { buffer: null, start: 0, end: 0 }
 
   const o = getEncoderAndId(name)
@@ -128,7 +142,7 @@ const route5 = {
   enc: getEncoding('@autopass/del-invite')
 }
 
-function getEncoderAndId (name) {
+function getEncoderAndId(name) {
   switch (name) {
     case '@autopass/remove-writer':
       return route0
