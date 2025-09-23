@@ -2,7 +2,7 @@
 
 Distributed notes/password manager
 
-``` sh
+```sh
 npm install autopass
 ```
 
@@ -13,7 +13,7 @@ npm install autopass
 
 First choose if you wanna pair or make a new instance.
 
-``` js
+```js
 import Autopass from 'autopass'
 import Corestore from 'corestore'
 
@@ -25,7 +25,7 @@ console.log('share to add', inv)
 
 Then invite another instance
 
-``` js
+```js
 const pair = Autopass.pair(new Corestore('./another-pass'), inv)
 
 const anotherPass = await pair.finished()
@@ -34,13 +34,13 @@ await anotherPass.ready()
 
 When paired you can simply start the instance again with the normal constructor.
 
-``` js
+```js
 await pass.add('a-note', 'hello this is a note')
 ```
 
 Then on the other node you get it out with
 
-``` js
+```js
 const note = await pass.get('a-note')
 console.log({ note })
 ```
@@ -74,7 +74,6 @@ Add new entry
 #### `await pass.addFile(name, buffer)`
 
 Add new file
-
 
 #### `await pass.remove(key)`
 
