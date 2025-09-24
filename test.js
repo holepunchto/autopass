@@ -122,14 +122,14 @@ test('suspend and resume', async function (t) {
   t.ok(a.swarm.peers.size > 0, 'a has peers after resume')
 })
 
-async function create (t, opts) {
+async function create(t, opts) {
   const dir = await tmp(t)
   const a = new Autopass(new Corestore(dir), opts)
   await a.ready()
   return a
 }
 
-async function pair (t, inv, opts) {
+async function pair(t, inv, opts) {
   const dir = await tmp(t)
   const a = Autopass.pair(new Corestore(dir), inv, opts)
   return a

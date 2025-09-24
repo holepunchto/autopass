@@ -20,7 +20,7 @@ if (pass.base.writable) {
 onupdate()
 pass.on('update', onupdate)
 
-function onupdate () {
+function onupdate() {
   console.log('db changed, all entries:')
   pass.list().on('data', console.log)
 }
