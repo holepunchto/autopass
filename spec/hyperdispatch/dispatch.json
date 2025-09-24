@@ -1,5 +1,6 @@
 {
   "version": 1,
+  "offset": 0,
   "schema": [
     {
       "id": 0,
@@ -21,18 +22,30 @@
     },
     {
       "id": 3,
+      "name": "@autopass/add-mirror",
+      "requestType": "@autopass/mirrors",
+      "version": 1
+    },
+    {
+      "id": 4,
+      "name": "@autopass/del-mirror",
+      "requestType": "@autopass/del-mirror",
+      "version": 1
+    },
+    {
+      "id": 5,
       "name": "@autopass/del",
       "requestType": "@autopass/delete",
       "version": 1
     },
     {
-      "id": 4,
+      "id": 6,
       "name": "@autopass/add-invite",
       "requestType": "@autopass/invite",
       "version": 1
     },
     {
-      "id": 5,
+      "id": 7,
       "name": "@autopass/del-invite",
       "requestType": "@autopass/del-invite",
       "version": 1

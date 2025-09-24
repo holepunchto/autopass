@@ -14,8 +14,10 @@ class Router {
     this._handler3 = null
     this._handler4 = null
     this._handler5 = null
+    this._handler6 = null
+    this._handler7 = null
 
-    this._missing = 6
+    this._missing = 8
   }
 
   add(name, handler) {
@@ -29,14 +31,20 @@ class Router {
       case '@autopass/put':
         this._handler2 = handler
         break
-      case '@autopass/del':
+      case '@autopass/add-mirror':
         this._handler3 = handler
         break
-      case '@autopass/add-invite':
+      case '@autopass/del-mirror':
         this._handler4 = handler
         break
-      case '@autopass/del-invite':
+      case '@autopass/del':
         this._handler5 = handler
+        break
+      case '@autopass/add-invite':
+        this._handler6 = handler
+        break
+      case '@autopass/del-invite':
+        this._handler7 = handler
         break
       default:
         throw new Error(
@@ -56,93 +64,133 @@ class Router {
       'Missing handler for "@autopass/add-writer"'
     )
     assert(this._handler2 !== null, 'Missing handler for "@autopass/put"')
-    assert(this._handler3 !== null, 'Missing handler for "@autopass/del"')
+    assert(
+      this._handler3 !== null,
+      'Missing handler for "@autopass/add-mirror"'
+    )
     assert(
       this._handler4 !== null,
+      'Missing handler for "@autopass/del-mirror"'
+    )
+    assert(this._handler5 !== null, 'Missing handler for "@autopass/del"')
+    assert(
+      this._handler6 !== null,
       'Missing handler for "@autopass/add-invite"'
     )
     assert(
-      this._handler5 !== null,
+      this._handler7 !== null,
       'Missing handler for "@autopass/del-invite"'
     )
   }
 
-  async dispatch(encoded, context) {
+  async dispatch(message, context) {
     if (this._missing > 0) {
       this._checkAll()
     }
 
-    const state = { buffer: encoded, start: 0, end: encoded.byteLength }
-    const id = c.uint.decode(state)
-
     setVersion(defaultVersion)
 
-    switch (id) {
+    const op = b4a.isBuffer(message) ? decode(message) : message
+
+    switch (op.id) {
       case 0:
-        return this._handler0(route0.enc.decode(state), context)
+        return this._handler0(op.value, context)
       case 1:
-        return this._handler1(route1.enc.decode(state), context)
+        return this._handler1(op.value, context)
       case 2:
-        return this._handler2(route2.enc.decode(state), context)
+        return this._handler2(op.value, context)
       case 3:
-        return this._handler3(route3.enc.decode(state), context)
+        return this._handler3(op.value, context)
       case 4:
-        return this._handler4(route4.enc.decode(state), context)
+        return this._handler4(op.value, context)
       case 5:
-        return this._handler5(route5.enc.decode(state), context)
+        return this._handler5(op.value, context)
+      case 6:
+        return this._handler6(op.value, context)
+      case 7:
+        return this._handler7(op.value, context)
       default:
-        throw new Error('Handler not found for ID:' + id)
+        throw new Error('Handler not found for ID:' + op.id)
     }
   }
 }
 
-function dispatch(name, message, { version = defaultVersion } = {}) {
+function encode(name, message, { version = defaultVersion } = {}) {
   const state = { buffer: null, start: 0, end: 0 }
 
-  const o = getEncoderAndId(name)
+  const route = getRouteByName(name)
   setVersion(version)
 
-  c.uint.preencode(state, o.id)
-  o.enc.preencode(state, message)
+  c.uint.preencode(state, route.id)
+  route.enc.preencode(state, message)
 
   state.buffer = b4a.allocUnsafe(state.end)
-  c.uint.encode(state, o.id)
-  o.enc.encode(state, message)
+  c.uint.encode(state, route.id)
+  route.enc.encode(state, message)
 
   return state.buffer
 }
 
+function decode(buffer, { version = defaultVersion } = {}) {
+  const state = { buffer, start: 0, end: buffer.length }
+
+  const id = c.uint.decode(state)
+  const route = getRouteById(id)
+  setVersion(version)
+
+  const value = route.enc.decode(state)
+  return { id, name: route.name, value }
+}
+
 const route0 = {
+  name: '@autopass/remove-writer',
   id: 0,
   enc: getEncoding('@autopass/writer')
 }
 
 const route1 = {
+  name: '@autopass/add-writer',
   id: 1,
   enc: getEncoding('@autopass/writer')
 }
 
 const route2 = {
+  name: '@autopass/put',
   id: 2,
   enc: getEncoding('@autopass/records')
 }
 
 const route3 = {
+  name: '@autopass/add-mirror',
   id: 3,
-  enc: getEncoding('@autopass/delete')
+  enc: getEncoding('@autopass/mirrors')
 }
 
 const route4 = {
+  name: '@autopass/del-mirror',
   id: 4,
-  enc: getEncoding('@autopass/invite')
+  enc: getEncoding('@autopass/del-mirror')
 }
 
 const route5 = {
+  name: '@autopass/del',
   id: 5,
+  enc: getEncoding('@autopass/delete')
+}
+
+const route6 = {
+  name: '@autopass/add-invite',
+  id: 6,
+  enc: getEncoding('@autopass/invite')
+}
+
+const route7 = {
+  name: '@autopass/del-invite',
+  id: 7,
   enc: getEncoding('@autopass/del-invite')
 }
 
-function getEncoderAndId(name) {
+function getRouteByName(name) {
   switch (name) {
     case '@autopass/remove-writer':
       return route0
@@ -150,19 +198,47 @@ function getEncoderAndId(name) {
       return route1
     case '@autopass/put':
       return route2
-    case '@autopass/del':
+    case '@autopass/add-mirror':
       return route3
-    case '@autopass/add-invite':
+    case '@autopass/del-mirror':
       return route4
-    case '@autopass/del-invite':
+    case '@autopass/del':
       return route5
+    case '@autopass/add-invite':
+      return route6
+    case '@autopass/del-invite':
+      return route7
     default:
       throw new Error('Handler not found for name: ' + name)
   }
 }
 
+function getRouteById(id) {
+  switch (id) {
+    case 0:
+      return route0
+    case 1:
+      return route1
+    case 2:
+      return route2
+    case 3:
+      return route3
+    case 4:
+      return route4
+    case 5:
+      return route5
+    case 6:
+      return route6
+    case 7:
+      return route7
+    default:
+      throw new Error('Handler not found for ID: ' + id)
+  }
+}
+
 module.exports = {
   version,
-  dispatch,
+  encode,
+  decode,
   Router
 }
