@@ -1,50 +1,51 @@
 // the js module powering the mobile and desktop app
 
-const Autobase = require('autobase')
-const BlindPairing = require('blind-pairing')
-const HyperDB = require('hyperdb')
-const Hyperswarm = require('hyperswarm')
-const ReadyResource = require('ready-resource')
-const z32 = require('z32')
-const b4a = require('b4a')
-const { Router, encode } = require('./spec/hyperdispatch')
-const BlindPeering = require('@holepunchto/blind-peering')
-const db = require('./spec/db/index.js')
+const Autobase = require("autobase");
+const BlindPairing = require("blind-pairing");
+const HyperDB = require("hyperdb");
+const Hyperswarm = require("hyperswarm");
+const ReadyResource = require("ready-resource");
+const z32 = require("z32");
+const b4a = require("b4a");
+const { Router, encode } = require("./spec/hyperdispatch");
+const BlindPeering = require("blind-peering");
+
+const db = require("./spec/db/index.js");
 
 class AutopassPairer extends ReadyResource {
-  constructor (store, invite, opts = {}) {
-    super()
-    this.store = store
-    this.invite = invite
-    this.swarm = null
-    this.pairing = null
-    this.peering = null
-    this.candidate = null
-    this.bootstrap = opts.bootstrap || null
-    this.onresolve = null
-    this.onreject = null
-    this.pass = null
+  constructor(store, invite, opts = {}) {
+    super();
+    this.store = store;
+    this.invite = invite;
+    this.swarm = null;
+    this.pairing = null;
+    this.peering = null;
+    this.candidate = null;
+    this.bootstrap = opts.bootstrap || null;
+    this.onresolve = null;
+    this.onreject = null;
+    this.pass = null;
 
-    this.ready().catch(noop)
+    this.ready().catch(noop);
   }
 
-  async _open () {
-    await this.store.ready()
+  async _open() {
+    await this.store.ready();
     this.swarm = new Hyperswarm({
-      keyPair: await this.store.createKeyPair('hyperswarm'),
-      bootstrap: this.bootstrap
-    })
+      keyPair: await this.store.createKeyPair("hyperswarm"),
+      bootstrap: this.bootstrap,
+    });
 
-    const store = this.store
-    this.swarm.on('connection', (connection, peerInfo) => {
-      store.replicate(connection)
-    })
+    const store = this.store;
+    this.swarm.on("connection", (connection, peerInfo) => {
+      store.replicate(connection);
+    });
 
-    this.pairing = new BlindPairing(this.swarm)
-    const core = Autobase.getLocalCore(this.store)
-    await core.ready()
-    const key = core.key
-    await core.close()
+    this.pairing = new BlindPairing(this.swarm);
+    const core = Autobase.getLocalCore(this.store);
+    await core.ready();
+    const key = core.key;
+    await core.close();
     this.candidate = this.pairing.addCandidate({
       invite: z32.decode(this.invite),
       userData: key,
@@ -54,284 +55,296 @@ class AutopassPairer extends ReadyResource {
             swarm: this.swarm,
             key: result.key,
             encryptionKey: result.encryptionKey,
-            bootstrap: this.bootstrap
-          })
+            bootstrap: this.bootstrap,
+          });
         }
-        this.swarm = null
-        this.store = null
-        if (this.onresolve) this._whenWritable()
-        this.candidate.close().catch(noop)
-      }
-    })
+        this.swarm = null;
+        this.store = null;
+        if (this.onresolve) this._whenWritable();
+        this.candidate.close().catch(noop);
+      },
+    });
   }
 
-  _whenWritable () {
-    if (this.pass.base.writable) return
+  _whenWritable() {
+    if (this.pass.base.writable) return;
     const check = () => {
       if (this.pass.base.writable) {
-        this.pass.base.off('update', check)
-        this.onresolve(this.pass)
+        this.pass.base.off("update", check);
+        this.onresolve(this.pass);
       }
-    }
-    this.pass.base.on('update', check)
+    };
+    this.pass.base.on("update", check);
   }
 
-  async _close () {
+  async _close() {
     if (this.candidate !== null) {
-      await this.candidate.close()
+      await this.candidate.close();
     }
 
     if (this.swarm !== null) {
-      await this.swarm.destroy()
+      await this.swarm.destroy();
     }
 
     if (this.store !== null) {
-      await this.store.close()
+      await this.store.close();
     }
 
     if (this.onreject) {
-      this.onreject(new Error('Pairing closed'))
+      this.onreject(new Error("Pairing closed"));
     } else if (this.base) {
-      await this.base.close()
+      await this.base.close();
     }
   }
 
-  finished () {
+  finished() {
     return new Promise((resolve, reject) => {
-      this.onresolve = resolve
-      this.onreject = reject
-    })
+      this.onresolve = resolve;
+      this.onreject = reject;
+    });
   }
 }
 
 class Autopass extends ReadyResource {
-  constructor (corestore, opts = {}) {
-    super()
-    this.router = new Router()
-    this.store = corestore
-    this.swarm = opts.swarm || null
-    this.base = null
-    this.bootstrap = opts.bootstrap || null
-    this.member = null
-    this.pairing = null
-    this.replicate = opts.replicate !== false
-    this.debug = !!opts.key
+  constructor(corestore, opts = {}) {
+    super();
+    this.router = new Router();
+    this.store = corestore;
+    this.swarm = opts.swarm || null;
+    this.base = null;
+    this.bootstrap = opts.bootstrap || null;
+    this.member = null;
+    this.pairing = null;
+    this.replicate = opts.replicate !== false;
+    this.debug = !!opts.key;
     // Register handlers for commands
-    this.router.add('@autopass/remove-writer', async (data, context) => {
-      await context.base.removeWriter(data.key)
-    })
+    this.router.add("@autopass/remove-writer", async (data, context) => {
+      await context.base.removeWriter(data.key);
+    });
 
-    this.router.add('@autopass/add-writer', async (data, context) => {
-      await context.base.addWriter(data.key)
-    })
+    this.router.add("@autopass/add-writer", async (data, context) => {
+      await context.base.addWriter(data.key);
+    });
 
-    this.router.add('@autopass/put', async (data, context) => {
-      await context.view.insert('@autopass/records', data)
-    })
+    this.router.add("@autopass/put", async (data, context) => {
+      await context.view.insert("@autopass/records", data);
+    });
 
-    this.router.add('@autopass/add-mirror', async (data, context) => {
-      await context.view.insert('@autopass/mirrors', data)
-    })
+    this.router.add("@autopass/add-mirror", async (data, context) => {
+      await context.view.insert("@autopass/mirrors", data);
+    });
 
-    this.router.add('@autopass/del', async (data, context) => {
-      await context.view.delete('@autopass/records', { key: data.key })
-    })
+    this.router.add("@autopass/del", async (data, context) => {
+      await context.view.delete("@autopass/records", { key: data.key });
+    });
 
-    this.router.add('@autopass/del-mirror', async (data, context) => {
-      await context.view.delete('@autopass/mirrors', { key: data.key })
-    })
+    this.router.add("@autopass/del-mirror", async (data, context) => {
+      await context.view.delete("@autopass/mirrors", { key: data.key });
+    });
 
-    this.router.add('@autopass/add-invite', async (data, context) => {
-      await context.view.insert('@autopass/invite', data)
-    })
+    this.router.add("@autopass/add-invite", async (data, context) => {
+      await context.view.insert("@autopass/invite", data);
+    });
 
-    this.router.add('@autopass/del-invite', async (data, context) => {
-      await context.view.delete('@autopass/invite', { id: data.id })
-    })
+    this.router.add("@autopass/del-invite", async (data, context) => {
+      await context.view.delete("@autopass/invite", { id: data.id });
+    });
 
-    this._boot(opts)
-    this.ready().catch(noop)
+    this._boot(opts);
+    this.ready().catch(noop);
   }
 
   // Initialize autobase
-  _boot (opts = {}) {
-    const { encryptionKey, key } = opts
+  _boot(opts = {}) {
+    const { encryptionKey, key } = opts;
 
     this.base = new Autobase(this.store, key, {
       encrypt: true,
       encryptionKey,
-      open (store) {
-        return HyperDB.bee(store.get('view'), db, {
+      open(store) {
+        return HyperDB.bee(store.get("view"), db, {
           extension: false,
-          autoUpdate: true
-        })
+          autoUpdate: true,
+        });
       },
       // New data blocks will be added using the apply function
-      apply: this._apply.bind(this)
-    })
+      apply: this._apply.bind(this),
+    });
 
-    this.base.on('update', () => {
-      if (!this.base._interrupting) this.emit('update')
-    })
+    this.base.on("update", () => {
+      if (!this.base._interrupting) this.emit("update");
+    });
   }
 
-  async _apply (nodes, view, base) {
+  async _apply(nodes, view, base) {
     for (const node of nodes) {
-      await this.router.dispatch(node.value, { view, base })
+      await this.router.dispatch(node.value, { view, base });
     }
-    await view.flush()
+    await view.flush();
   }
 
-  async _open () {
-    await this.base.ready()
-    if (this.replicate) await this._replicate()
+  async _open() {
+    await this.base.ready();
+    if (this.replicate) await this._replicate();
   }
 
-  async _close () {
+  async _close() {
     if (this.swarm) {
-      await this.member.close()
-      await this.pairing.close()
-      await this.swarm.destroy()
+      await this.member.close();
+      await this.pairing.close();
+      await this.swarm.destroy();
     }
-    await this.base.close()
+    await this.base.close();
   }
 
-  get writerKey () {
-    return this.base.local.key
+  get writerKey() {
+    return this.base.local.key;
   }
 
-  get key () {
-    return this.base.key
+  get key() {
+    return this.base.key;
   }
 
-  get discoveryKey () {
-    return this.base.discoveryKey
+  get discoveryKey() {
+    return this.base.discoveryKey;
   }
 
-  get encryptionKey () {
-    return this.base.encryptionKey
+  get encryptionKey() {
+    return this.base.encryptionKey;
   }
 
-  static pair (store, invite, opts) {
-    return new AutopassPairer(store, invite, opts)
+  static pair(store, invite, opts) {
+    return new AutopassPairer(store, invite, opts);
   }
 
-  async createInvite (opts) {
-    if (this.opened === false) await this.ready()
-    const existing = await this.base.view.findOne('@autopass/invite', {})
+  async createInvite(opts) {
+    if (this.opened === false) await this.ready();
+    const existing = await this.base.view.findOne("@autopass/invite", {});
     if (existing) {
-      return z32.encode(existing.invite)
+      return z32.encode(existing.invite);
     }
-    const { id, invite, publicKey, expires } = BlindPairing.createInvite(this.base.key)
+    const { id, invite, publicKey, expires } = BlindPairing.createInvite(
+      this.base.key,
+    );
 
-    const record = { id, invite, publicKey, expires }
-    await this.base.append(encode('@autopass/add-invite', record))
-    return z32.encode(record.invite)
+    const record = { id, invite, publicKey, expires };
+    await this.base.append(encode("@autopass/add-invite", record));
+    return z32.encode(record.invite);
   }
 
-  async deleteInvite () {
-    if (this.opened === false) await this.ready()
-    const existing = await this.base.view.findOne('@autopass/invite', {})
+  async deleteInvite() {
+    if (this.opened === false) await this.ready();
+    const existing = await this.base.view.findOne("@autopass/invite", {});
     if (existing) {
-      await this.base.append(encode('@autopass/del-invite', existing))
+      await this.base.append(encode("@autopass/del-invite", existing));
     }
   }
 
-  list (opts) {
-    return this.base.view.find('@autopass/records', {})
+  list(opts) {
+    return this.base.view.find("@autopass/records", {});
   }
 
-  async get (key) {
-    const data = await this.base.view.get('@autopass/records', { key })
+  async get(key) {
+    const data = await this.base.view.get("@autopass/records", { key });
     if (data === null) {
-      return null
+      return null;
     }
-    return data.value
+    return data.value;
   }
 
-  async addWriter (key) {
-    await this.base.append(encode('@autopass/add-writer', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
-    return true
+  async addWriter(key) {
+    await this.base.append(
+      encode("@autopass/add-writer", {
+        key: b4a.isBuffer(key) ? key : b4a.from(key),
+      }),
+    );
+    return true;
   }
 
-  async removeWriter (key) {
-    await this.base.append(encode('@autopass/remove-writer', { key: b4a.isBuffer(key) ? key : b4a.from(key) }))
+  async removeWriter(key) {
+    await this.base.append(
+      encode("@autopass/remove-writer", {
+        key: b4a.isBuffer(key) ? key : b4a.from(key),
+      }),
+    );
   }
 
-  get writable () {
-    return this.base.writable
+  get writable() {
+    return this.base.writable;
   }
 
-  async _replicate () {
-    await this.base.ready()
+  async _replicate() {
+    await this.base.ready();
     if (this.swarm === null) {
       this.swarm = new Hyperswarm({
-        keyPair: await this.store.createKeyPair('hyperswarm'),
-        bootstrap: this.bootstrap
-      })
-      this.swarm.on('connection', (connection, peerInfo) => {
-        this.store.replicate(connection)
-      })
+        keyPair: await this.store.createKeyPair("hyperswarm"),
+        bootstrap: this.bootstrap,
+      });
+      this.swarm.on("connection", (connection, peerInfo) => {
+        this.store.replicate(connection);
+      });
     }
-    this.pairing = new BlindPairing(this.swarm)
+    this.pairing = new BlindPairing(this.swarm);
     this.member = this.pairing.addMember({
       discoveryKey: this.base.discoveryKey,
       onadd: async (candidate) => {
-        const id = candidate.inviteId
-        const inv = await this.base.view.findOne('@autopass/invite', {})
+        const id = candidate.inviteId;
+        const inv = await this.base.view.findOne("@autopass/invite", {});
         if (!b4a.equals(inv.id, id)) {
-          return
+          return;
         }
-        candidate.open(inv.publicKey)
-        await this.addWriter(candidate.userData)
+        candidate.open(inv.publicKey);
+        await this.addWriter(candidate.userData);
         candidate.confirm({
           key: this.base.key,
-          encryptionKey: this.base.encryptionKey
-        })
-      }
-    })
-    this.swarm.join(this.base.discoveryKey)
+          encryptionKey: this.base.encryptionKey,
+        });
+      },
+    });
+    this.swarm.join(this.base.discoveryKey);
 
-    const mirrorList = await this.getMirror()
-    const mirrors = mirrorList.map(item => item.key)
-    this.peering = new BlindPeering(this.swarm, this.store, { autobaseMirrors: mirrors })
-    this.peering.addAutobaseBackground(this.base)
+    const mirrorList = await this.getMirror();
+    const mirrors = mirrorList.map((item) => item.key);
+    this.peering = new BlindPeering(this.swarm, this.store, {
+      autobaseMirrors: mirrors,
+    });
+    this.peering.addAutobaseBackground(this.base);
   }
 
-  async add (key, value) {
-    await this.base.append(encode('@autopass/put', { key, value }))
+  async add(key, value) {
+    await this.base.append(encode("@autopass/put", { key, value }));
   }
 
-  async addFile (key, file) {
-    await this.base.append(encode('@autopass/put', { key, file }))
+  async addFile(key, file) {
+    await this.base.append(encode("@autopass/put", { key, file }));
   }
 
-  async getFile (key) {
-    const data = await this.base.view.get('@autopass/records', { key })
+  async getFile(key) {
+    const data = await this.base.view.get("@autopass/records", { key });
     if (data === null) {
-      return null
+      return null;
     }
-    return data.file
+    return data.file;
   }
 
-  async addMirror (key) {
-    await this.base.append(encode('@autopass/add-mirror', { key }))
+  async addMirror(key) {
+    await this.base.append(encode("@autopass/add-mirror", { key }));
   }
 
-  async getMirror () {
-    const queryStream = this.base.view.find('@autopass/mirrors', {})
-    return await queryStream.toArray()
+  async getMirror() {
+    const queryStream = this.base.view.find("@autopass/mirrors", {});
+    return await queryStream.toArray();
   }
 
-  async removeMirror (key) {
-    await this.base.append(encode('@autopass/del-mirror', { key }))
+  async removeMirror(key) {
+    await this.base.append(encode("@autopass/del-mirror", { key }));
   }
 
-  async remove (key) {
-    await this.base.append(encode('@autopass/del', { key }))
+  async remove(key) {
+    await this.base.append(encode("@autopass/del", { key }));
   }
 } // end class
 
-function noop () {}
+function noop() {}
 
-module.exports = Autopass
+module.exports = Autopass;

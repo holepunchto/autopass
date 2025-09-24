@@ -2,7 +2,7 @@
 
 Distributed notes/password manager
 
-``` sh
+```sh
 npm install autopass
 ```
 
@@ -13,36 +13,36 @@ npm install autopass
 
 First choose if you wanna pair or make a new instance.
 
-``` js
-import Autopass from 'autopass'
-import Corestore from 'corestore'
+```js
+import Autopass from "autopass";
+import Corestore from "corestore";
 
-const pass = new Autopass(new Corestore('./pass'))
+const pass = new Autopass(new Corestore("./pass"));
 
-const inv = await pass.createInvite()
-console.log('share to add', inv)
+const inv = await pass.createInvite();
+console.log("share to add", inv);
 ```
 
 Then invite another instance
 
-``` js
-const pair = Autopass.pair(new Corestore('./another-pass'), inv)
+```js
+const pair = Autopass.pair(new Corestore("./another-pass"), inv);
 
-const anotherPass = await pair.finished()
-await anotherPass.ready()
+const anotherPass = await pair.finished();
+await anotherPass.ready();
 ```
 
 When paired you can simply start the instance again with the normal constructor.
 
-``` js
-await pass.add('a-note', 'hello this is a note')
+```js
+await pass.add("a-note", "hello this is a note");
 ```
 
 Then on the other node you get it out with
 
-``` js
-const note = await pass.get('a-note')
-console.log({ note })
+```js
+const note = await pass.get("a-note");
+console.log({ note });
 ```
 
 ## API
@@ -74,7 +74,6 @@ Add new entry
 #### `await pass.addFIle(name, buffer)`
 
 Add new file
-
 
 #### `await pass.remove(key)`
 
@@ -118,11 +117,11 @@ Force close the pair instance. Only need to call this if you dont wait for it to
 
 #### `await pass.addMirror(key)`
 
-Add a blind mirror. 
+Add a blind mirror.
 
 #### `await getMirror()`
 
-Returns an array of blind mirrors 
+Returns an array of blind mirrors
 
 #### `await removeMirror(key)`
 

@@ -2,183 +2,200 @@
 // Schema Version: 1
 /* eslint-disable camelcase */
 /* eslint-disable quotes */
+/* eslint-disable space-before-function-paren */
 
-const { c } = require('hyperschema/runtime')
+const { c } = require("hyperschema/runtime");
 
-const VERSION = 1
+const VERSION = 1;
 
 // eslint-disable-next-line no-unused-vars
-let version = VERSION
+let version = VERSION;
 
 // @autopass/records
 const encoding0 = {
-  preencode (state, m) {
-    c.string.preencode(state, m.key)
-    state.end++ // max flag is 2 so always one byte
+  preencode(state, m) {
+    c.string.preencode(state, m.key);
+    state.end++; // max flag is 2 so always one byte
 
-    if (m.value) c.string.preencode(state, m.value)
-    if (m.file) c.buffer.preencode(state, m.file)
+    if (m.value) c.string.preencode(state, m.value);
+    if (m.file) c.buffer.preencode(state, m.file);
   },
-  encode (state, m) {
-    const flags =
-      (m.value ? 1 : 0) |
-      (m.file ? 2 : 0)
+  encode(state, m) {
+    const flags = (m.value ? 1 : 0) | (m.file ? 2 : 0);
 
-    c.string.encode(state, m.key)
-    c.uint.encode(state, flags)
+    c.string.encode(state, m.key);
+    c.uint.encode(state, flags);
 
-    if (m.value) c.string.encode(state, m.value)
-    if (m.file) c.buffer.encode(state, m.file)
+    if (m.value) c.string.encode(state, m.value);
+    if (m.file) c.buffer.encode(state, m.file);
   },
-  decode (state) {
-    const r0 = c.string.decode(state)
-    const flags = c.uint.decode(state)
+  decode(state) {
+    const r0 = c.string.decode(state);
+    const flags = c.uint.decode(state);
 
     return {
       key: r0,
       value: (flags & 1) !== 0 ? c.string.decode(state) : null,
-      file: (flags & 2) !== 0 ? c.buffer.decode(state) : null
-    }
-  }
-}
+      file: (flags & 2) !== 0 ? c.buffer.decode(state) : null,
+    };
+  },
+};
 
 // @autopass/mirrors
 const encoding1 = {
-  preencode (state, m) {
-    c.string.preencode(state, m.key)
+  preencode(state, m) {
+    c.string.preencode(state, m.key);
   },
-  encode (state, m) {
-    c.string.encode(state, m.key)
+  encode(state, m) {
+    c.string.encode(state, m.key);
   },
-  decode (state) {
-    const r0 = c.string.decode(state)
+  decode(state) {
+    const r0 = c.string.decode(state);
 
     return {
-      key: r0
-    }
-  }
-}
+      key: r0,
+    };
+  },
+};
 
 // @autopass/writer
 const encoding2 = {
-  preencode (state, m) {
-    c.buffer.preencode(state, m.key)
+  preencode(state, m) {
+    c.buffer.preencode(state, m.key);
   },
-  encode (state, m) {
-    c.buffer.encode(state, m.key)
+  encode(state, m) {
+    c.buffer.encode(state, m.key);
   },
-  decode (state) {
-    const r0 = c.buffer.decode(state)
+  decode(state) {
+    const r0 = c.buffer.decode(state);
 
     return {
-      key: r0
-    }
-  }
-}
+      key: r0,
+    };
+  },
+};
 
 // @autopass/delete
-const encoding3 = encoding1
+const encoding3 = encoding1;
 
 // @autopass/invite
 const encoding4 = {
-  preencode (state, m) {
-    c.buffer.preencode(state, m.id)
-    c.buffer.preencode(state, m.invite)
-    c.buffer.preencode(state, m.publicKey)
-    c.int.preencode(state, m.expires)
+  preencode(state, m) {
+    c.buffer.preencode(state, m.id);
+    c.buffer.preencode(state, m.invite);
+    c.buffer.preencode(state, m.publicKey);
+    c.int.preencode(state, m.expires);
   },
-  encode (state, m) {
-    c.buffer.encode(state, m.id)
-    c.buffer.encode(state, m.invite)
-    c.buffer.encode(state, m.publicKey)
-    c.int.encode(state, m.expires)
+  encode(state, m) {
+    c.buffer.encode(state, m.id);
+    c.buffer.encode(state, m.invite);
+    c.buffer.encode(state, m.publicKey);
+    c.int.encode(state, m.expires);
   },
-  decode (state) {
-    const r0 = c.buffer.decode(state)
-    const r1 = c.buffer.decode(state)
-    const r2 = c.buffer.decode(state)
-    const r3 = c.int.decode(state)
+  decode(state) {
+    const r0 = c.buffer.decode(state);
+    const r1 = c.buffer.decode(state);
+    const r2 = c.buffer.decode(state);
+    const r3 = c.int.decode(state);
 
     return {
       id: r0,
       invite: r1,
       publicKey: r2,
-      expires: r3
-    }
-  }
-}
+      expires: r3,
+    };
+  },
+};
 
 // @autopass/del-invite
 const encoding5 = {
-  preencode (state, m) {
-    c.buffer.preencode(state, m.id)
+  preencode(state, m) {
+    c.buffer.preencode(state, m.id);
   },
-  encode (state, m) {
-    c.buffer.encode(state, m.id)
+  encode(state, m) {
+    c.buffer.encode(state, m.id);
   },
-  decode (state) {
-    const r0 = c.buffer.decode(state)
+  decode(state) {
+    const r0 = c.buffer.decode(state);
 
     return {
-      id: r0
-    }
-  }
-}
+      id: r0,
+    };
+  },
+};
 
 // @autopass/del-mirror
-const encoding6 = encoding1
+const encoding6 = encoding1;
 
-function setVersion (v) {
-  version = v
+function setVersion(v) {
+  version = v;
 }
 
-function encode (name, value, v = VERSION) {
-  version = v
-  return c.encode(getEncoding(name), value)
+function encode(name, value, v = VERSION) {
+  version = v;
+  return c.encode(getEncoding(name), value);
 }
 
-function decode (name, buffer, v = VERSION) {
-  version = v
-  return c.decode(getEncoding(name), buffer)
+function decode(name, buffer, v = VERSION) {
+  version = v;
+  return c.decode(getEncoding(name), buffer);
 }
 
-function getEnum (name) {
+function getEnum(name) {
   switch (name) {
-    default: throw new Error('Enum not found ' + name)
+    default:
+      throw new Error("Enum not found " + name);
   }
 }
 
-function getEncoding (name) {
+function getEncoding(name) {
   switch (name) {
-    case '@autopass/records': return encoding0
-    case '@autopass/mirrors': return encoding1
-    case '@autopass/writer': return encoding2
-    case '@autopass/delete': return encoding3
-    case '@autopass/invite': return encoding4
-    case '@autopass/del-invite': return encoding5
-    case '@autopass/del-mirror': return encoding6
-    default: throw new Error('Encoder not found ' + name)
+    case "@autopass/records":
+      return encoding0;
+    case "@autopass/mirrors":
+      return encoding1;
+    case "@autopass/writer":
+      return encoding2;
+    case "@autopass/delete":
+      return encoding3;
+    case "@autopass/invite":
+      return encoding4;
+    case "@autopass/del-invite":
+      return encoding5;
+    case "@autopass/del-mirror":
+      return encoding6;
+    default:
+      throw new Error("Encoder not found " + name);
   }
 }
 
-function getStruct (name, v = VERSION) {
-  const enc = getEncoding(name)
+function getStruct(name, v = VERSION) {
+  const enc = getEncoding(name);
   return {
-    preencode (state, m) {
-      version = v
-      enc.preencode(state, m)
+    preencode(state, m) {
+      version = v;
+      enc.preencode(state, m);
     },
-    encode (state, m) {
-      version = v
-      enc.encode(state, m)
+    encode(state, m) {
+      version = v;
+      enc.encode(state, m);
     },
-    decode (state) {
-      version = v
-      return enc.decode(state)
-    }
-  }
+    decode(state) {
+      version = v;
+      return enc.decode(state);
+    },
+  };
 }
 
-const resolveStruct = getStruct // compat
+const resolveStruct = getStruct; // compat
 
-module.exports = { resolveStruct, getStruct, getEnum, getEncoding, encode, decode, setVersion, version }
+module.exports = {
+  resolveStruct,
+  getStruct,
+  getEnum,
+  getEncoding,
+  encode,
+  decode,
+  setVersion,
+  version,
+};

@@ -1,89 +1,89 @@
-const test = require('brittle')
-const Autopass = require('./')
-const Corestore = require('corestore')
-const testnet = require('hyperdht/testnet')
-const tmp = require('test-tmp')
+const test = require("brittle");
+const Autopass = require("./");
+const Corestore = require("corestore");
+const testnet = require("hyperdht/testnet");
+const tmp = require("test-tmp");
 
-test('basic', async function (t) {
-  const a = await create(t, { replicate: false })
+test("basic", async function (t) {
+  const a = await create(t, { replicate: false });
 
-  await a.add('hello', 'world')
+  await a.add("hello", "world");
 
-  t.ok(a.base.encryptionKey)
-  t.is(await a.get('hello'), 'world')
+  t.ok(a.base.encryptionKey);
+  t.is(await a.get("hello"), "world");
 
-  await a.close()
-})
+  await a.close();
+});
 
-test('invites', async function (t) {
-  t.plan(2)
+test("invites", async function (t) {
+  t.plan(2);
 
-  const tn = await testnet(10, t)
+  const tn = await testnet(10, t);
 
-  const a = await create(t, { bootstrap: tn.bootstrap })
+  const a = await create(t, { bootstrap: tn.bootstrap });
   t.teardown(() => {
-    a.close()
-    a.removeListener('update', onUpdate)
-  })
+    a.close();
+    a.removeListener("update", onUpdate);
+  });
 
   const onUpdate = function () {
-    if (a.base.system.members === 2) t.pass('a has two members')
-  }
+    if (a.base.system.members === 2) t.pass("a has two members");
+  };
 
-  a.on('update', onUpdate)
+  a.on("update", onUpdate);
 
-  const inv = await a.createInvite()
+  const inv = await a.createInvite();
 
-  const p = await pair(t, inv, { bootstrap: tn.bootstrap })
+  const p = await pair(t, inv, { bootstrap: tn.bootstrap });
 
-  const b = await p.finished()
-  await b.ready()
+  const b = await p.finished();
+  await b.ready();
 
-  t.teardown(() => b.close())
-  b.on('update', function () {
-    if (b.base.system.members === 2) t.pass('b has two members')
-  })
-})
+  t.teardown(() => b.close());
+  b.on("update", function () {
+    if (b.base.system.members === 2) t.pass("b has two members");
+  });
+});
 
-test('invites', async function (t) {
-  t.plan(2)
+test("invites", async function (t) {
+  t.plan(2);
 
-  const tn = await testnet(10, t)
+  const tn = await testnet(10, t);
 
-  const a = await create(t, { bootstrap: tn.bootstrap })
+  const a = await create(t, { bootstrap: tn.bootstrap });
   t.teardown(() => {
-    a.close()
-    a.removeListener('update', updateListener) // Remove the listener in teardown
-  })
+    a.close();
+    a.removeListener("update", updateListener); // Remove the listener in teardown
+  });
 
   const updateListener = function () {
-    if (a.base.system.members === 2) t.pass('a has two members')
-  }
+    if (a.base.system.members === 2) t.pass("a has two members");
+  };
 
-  a.on('update', updateListener)
+  a.on("update", updateListener);
 
-  const inv = await a.createInvite()
+  const inv = await a.createInvite();
 
-  const p = await pair(t, inv, { bootstrap: tn.bootstrap })
+  const p = await pair(t, inv, { bootstrap: tn.bootstrap });
 
-  const b = await p.finished()
-  await b.ready()
+  const b = await p.finished();
+  await b.ready();
 
-  t.teardown(() => b.close())
-  b.on('update', function () {
-    if (b.base.system.members === 2) t.pass('b has two members')
-  })
-})
+  t.teardown(() => b.close());
+  b.on("update", function () {
+    if (b.base.system.members === 2) t.pass("b has two members");
+  });
+});
 
-async function create (t, opts) {
-  const dir = await tmp(t)
-  const a = new Autopass(new Corestore(dir), opts)
-  await a.ready()
-  return a
+async function create(t, opts) {
+  const dir = await tmp(t);
+  const a = new Autopass(new Corestore(dir), opts);
+  await a.ready();
+  return a;
 }
 
-async function pair (t, inv, opts) {
-  const dir = await tmp(t)
-  const a = Autopass.pair(new Corestore(dir), inv, opts)
-  return a
+async function pair(t, inv, opts) {
+  const dir = await tmp(t);
+  const a = Autopass.pair(new Corestore(dir), inv, opts);
+  return a;
 }
