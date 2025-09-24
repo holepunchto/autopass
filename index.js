@@ -312,6 +312,22 @@ class Autopass extends ReadyResource {
   async remove(key) {
     await this.base.append(dispatch('@autopass/del', { key }))
   }
+
+  async suspend() {
+    if (this.swarm) {
+      await this.pairing.suspend()
+      await this.swarm.suspend()
+      await this.store.suspend()
+    }
+  }
+
+  async resume() {
+    if (this.swarm) {
+      await this.store.resume()
+      await this.swarm.resume()
+      await this.pairing.resume()
+    }
+  }
 } // end class
 
 function noop() {}
