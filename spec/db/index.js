@@ -269,12 +269,120 @@ const collection4 = {
   indexes: []
 }
 
+// '@autopass/del-mirror' collection key
+const collection5_key = new IndexEncoder([IndexEncoder.STRING], { prefix: 5 })
+
+function collection5_indexify(record) {
+  const a = record.key
+  return a === undefined ? [] : [a]
+}
+
+// '@autopass/del-mirror' value encoding
+const collection5_enc = getEncoding('@autopass/del-mirror/hyperdb#5')
+
+// '@autopass/del-mirror' reconstruction function
+function collection5_reconstruct(version, keyBuf, valueBuf) {
+  const key = collection5_key.decode(keyBuf)
+  setVersion(version)
+  const record = c.decode(collection5_enc, valueBuf)
+  record.key = key[0]
+  return record
+}
+// '@autopass/del-mirror' key reconstruction function
+function collection5_reconstruct_key(keyBuf) {
+  const key = collection5_key.decode(keyBuf)
+  return {
+    key: key[0]
+  }
+}
+
+// '@autopass/del-mirror'
+const collection5 = {
+  name: '@autopass/del-mirror',
+  id: 5,
+  encodeKey(record) {
+    const key = [record.key]
+    return collection5_key.encode(key)
+  },
+  encodeKeyRange({ gt, lt, gte, lte } = {}) {
+    return collection5_key.encodeRange({
+      gt: gt ? collection5_indexify(gt) : null,
+      lt: lt ? collection5_indexify(lt) : null,
+      gte: gte ? collection5_indexify(gte) : null,
+      lte: lte ? collection5_indexify(lte) : null
+    })
+  },
+  encodeValue(version, record) {
+    setVersion(version)
+    return c.encode(collection5_enc, record)
+  },
+  trigger: null,
+  reconstruct: collection5_reconstruct,
+  reconstructKey: collection5_reconstruct_key,
+  indexes: []
+}
+
+// '@autopass/mirrors' collection key
+const collection6_key = new IndexEncoder([IndexEncoder.STRING], { prefix: 6 })
+
+function collection6_indexify(record) {
+  const a = record.key
+  return a === undefined ? [] : [a]
+}
+
+// '@autopass/mirrors' value encoding
+const collection6_enc = getEncoding('@autopass/mirrors/hyperdb#6')
+
+// '@autopass/mirrors' reconstruction function
+function collection6_reconstruct(version, keyBuf, valueBuf) {
+  const key = collection6_key.decode(keyBuf)
+  setVersion(version)
+  const record = c.decode(collection6_enc, valueBuf)
+  record.key = key[0]
+  return record
+}
+// '@autopass/mirrors' key reconstruction function
+function collection6_reconstruct_key(keyBuf) {
+  const key = collection6_key.decode(keyBuf)
+  return {
+    key: key[0]
+  }
+}
+
+// '@autopass/mirrors'
+const collection6 = {
+  name: '@autopass/mirrors',
+  id: 6,
+  encodeKey(record) {
+    const key = [record.key]
+    return collection6_key.encode(key)
+  },
+  encodeKeyRange({ gt, lt, gte, lte } = {}) {
+    return collection6_key.encodeRange({
+      gt: gt ? collection6_indexify(gt) : null,
+      lt: lt ? collection6_indexify(lt) : null,
+      gte: gte ? collection6_indexify(gte) : null,
+      lte: lte ? collection6_indexify(lte) : null
+    })
+  },
+  encodeValue(version, record) {
+    setVersion(version)
+    return c.encode(collection6_enc, record)
+  },
+  trigger: null,
+  reconstruct: collection6_reconstruct,
+  reconstructKey: collection6_reconstruct_key,
+  indexes: []
+}
+
 const collections = [
   collection0,
   collection1,
   collection2,
   collection3,
-  collection4
+  collection4,
+  collection5,
+  collection6
 ]
 
 const indexes = []
@@ -299,6 +407,10 @@ function resolveCollection(name) {
       return collection3
     case '@autopass/del-invite':
       return collection4
+    case '@autopass/del-mirror':
+      return collection5
+    case '@autopass/mirrors':
+      return collection6
     default:
       return null
   }

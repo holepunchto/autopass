@@ -7,7 +7,8 @@ const Hyperswarm = require('hyperswarm')
 const ReadyResource = require('ready-resource')
 const z32 = require('z32')
 const b4a = require('b4a')
-const { Router, dispatch } = require('./spec/hyperdispatch')
+const { Router, encode } = require('./spec/hyperdispatch')
+const BlindPeering = require('blind-peering')
 const db = require('./spec/db/index.js')
 
 class AutopassPairer extends ReadyResource {
@@ -17,6 +18,7 @@ class AutopassPairer extends ReadyResource {
     this.invite = invite
     this.swarm = null
     this.pairing = null
+    this.peering = null
     this.candidate = null
     this.bootstrap = opts.bootstrap || null
     this.onresolve = null
@@ -127,8 +129,16 @@ class Autopass extends ReadyResource {
       await context.view.insert('@autopass/records', data)
     })
 
+    this.router.add('@autopass/add-mirror', async (data, context) => {
+      await context.view.insert('@autopass/mirrors', data)
+    })
+
     this.router.add('@autopass/del', async (data, context) => {
       await context.view.delete('@autopass/records', { key: data.key })
+    })
+
+    this.router.add('@autopass/del-mirror', async (data, context) => {
+      await context.view.delete('@autopass/mirrors', { key: data.key })
     })
 
     this.router.add('@autopass/add-invite', async (data, context) => {
@@ -217,7 +227,7 @@ class Autopass extends ReadyResource {
     )
 
     const record = { id, invite, publicKey, expires }
-    await this.base.append(dispatch('@autopass/add-invite', record))
+    await this.base.append(encode('@autopass/add-invite', record))
     return z32.encode(record.invite)
   }
 
@@ -225,7 +235,7 @@ class Autopass extends ReadyResource {
     if (this.opened === false) await this.ready()
     const existing = await this.base.view.findOne('@autopass/invite', {})
     if (existing) {
-      await this.base.append(dispatch('@autopass/del-invite', existing))
+      await this.base.append(encode('@autopass/del-invite', existing))
     }
   }
 
@@ -243,7 +253,7 @@ class Autopass extends ReadyResource {
 
   async addWriter(key) {
     await this.base.append(
-      dispatch('@autopass/add-writer', {
+      encode('@autopass/add-writer', {
         key: b4a.isBuffer(key) ? key : b4a.from(key)
       })
     )
@@ -252,7 +262,7 @@ class Autopass extends ReadyResource {
 
   async removeWriter(key) {
     await this.base.append(
-      dispatch('@autopass/remove-writer', {
+      encode('@autopass/remove-writer', {
         key: b4a.isBuffer(key) ? key : b4a.from(key)
       })
     )
@@ -291,14 +301,21 @@ class Autopass extends ReadyResource {
       }
     })
     this.swarm.join(this.base.discoveryKey)
+
+    const mirrorList = await this.getMirror()
+    const mirrors = mirrorList.map((item) => item.key)
+    this.peering = new BlindPeering(this.swarm, this.store, {
+      autobaseMirrors: mirrors
+    })
+    this.peering.addAutobaseBackground(this.base)
   }
 
   async add(key, value) {
-    await this.base.append(dispatch('@autopass/put', { key, value }))
+    await this.base.append(encode('@autopass/put', { key, value }))
   }
 
   async addFile(key, file) {
-    await this.base.append(dispatch('@autopass/put', { key, file }))
+    await this.base.append(encode('@autopass/put', { key, file }))
   }
 
   async getFile(key) {
@@ -309,8 +326,21 @@ class Autopass extends ReadyResource {
     return data.file
   }
 
+  async addMirror(key) {
+    await this.base.append(encode('@autopass/add-mirror', { key }))
+  }
+
+  async getMirror() {
+    const queryStream = this.base.view.find('@autopass/mirrors', {})
+    return await queryStream.toArray()
+  }
+
+  async removeMirror(key) {
+    await this.base.append(encode('@autopass/del-mirror', { key }))
+  }
+
   async remove(key) {
-    await this.base.append(dispatch('@autopass/del', { key }))
+    await this.base.append(encode('@autopass/del', { key }))
   }
 } // end class
 

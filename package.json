@@ -33,6 +33,7 @@
     "autobase": "^7.19.4",
     "b4a": "^1.7.1",
     "blind-pairing": "^2.3.1",
+    "blind-peering": "^1.13.0",
     "compact-encoding": "^2.16.1",
     "corestore": "^7.4.7",
     "hyperbee": "^2.26.5",

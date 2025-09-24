@@ -56,6 +56,28 @@
       "derived": false,
       "key": ["id"],
       "trigger": null
+    },
+    {
+      "name": "del-mirror",
+      "namespace": "autopass",
+      "id": 5,
+      "type": 1,
+      "indexes": [],
+      "schema": "@autopass/del-mirror",
+      "derived": false,
+      "key": ["key"],
+      "trigger": null
+    },
+    {
+      "name": "mirrors",
+      "namespace": "autopass",
+      "id": 6,
+      "type": 1,
+      "indexes": [],
+      "schema": "@autopass/mirrors",
+      "derived": false,
+      "key": ["key"],
+      "trigger": null
     }
   ]
 }
