@@ -10,7 +10,7 @@ test('basic', async function (t) {
   await a.add('hello', 'world')
 
   t.ok(a.base.encryptionKey)
-  t.is(await a.get('hello'), 'world')
+  t.is((await a.get('hello')).value, 'world')
 
   await a.close()
 })

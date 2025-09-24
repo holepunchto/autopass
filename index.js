@@ -240,7 +240,7 @@ class Autopass extends ReadyResource {
     if (data === null) {
       return null
     }
-    return data.value
+    return { value: data.value, file: data.file }
   }
 
   async addWriter(key) {
