@@ -313,7 +313,7 @@ class Autopass extends ReadyResource {
     await this.base.append(dispatch('@autopass/del', { key }))
   }
 
-  async suspend () {
+  async suspend() {
     if (this.swarm) {
       await this.pairing.suspend()
       await this.swarm.suspend()
@@ -321,7 +321,7 @@ class Autopass extends ReadyResource {
     }
   }
 
-  async resume () {
+  async resume() {
     if (this.swarm) {
       await this.store.resume()
       await this.swarm.resume()
