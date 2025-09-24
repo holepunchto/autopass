@@ -296,20 +296,8 @@ class Autopass extends ReadyResource {
     this.swarm.join(this.base.discoveryKey)
   }
 
-  async add(key, value) {
-    await this.base.append(dispatch('@autopass/put', { key, value }))
-  }
-
-  async addFile(key, file) {
-    await this.base.append(dispatch('@autopass/put', { key, file }))
-  }
-
-  async getFile(key) {
-    const data = await this.base.view.get('@autopass/records', { key })
-    if (data === null) {
-      return null
-    }
-    return data.file
+  async add(key, value, file) {
+    await this.base.append(dispatch('@autopass/put', { key, value, file }))
   }
 
   async remove(key) {

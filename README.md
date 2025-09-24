@@ -59,21 +59,13 @@ Triggered when it updates, ie something added/removed an entry
 
 Get an entry.
 
-#### `value = await pass.getFile(name)`
-
-Get a file.
-
 #### `stream = pass.list()`
 
 Get all entries.
 
-#### `await pass.add(key, value)`
+#### `await pass.add(key, value, file)`
 
 Add new entry
-
-#### `await pass.addFile(name, buffer)`
-
-Add new file
 
 #### `await pass.remove(key)`
 
