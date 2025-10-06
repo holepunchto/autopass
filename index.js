@@ -57,6 +57,8 @@ class AutopassPairer extends ReadyResource {
             encryptionKey: result.encryptionKey,
             bootstrap: this.bootstrap
           })
+
+          await this.pass.deleteInvite()
         }
         this.swarm = null
         this.store = null
@@ -249,7 +251,7 @@ class Autopass extends ReadyResource {
     if (data === null) {
       return null
     }
-    return data.value
+    return { value: data.value, file: data.file }
   }
 
   async addWriter(key) {
@@ -299,6 +301,7 @@ class Autopass extends ReadyResource {
           key: this.base.key,
           encryptionKey: this.base.encryptionKey
         })
+        await this.deleteInvite()
       }
     })
     this.swarm.join(this.base.discoveryKey)
@@ -311,20 +314,12 @@ class Autopass extends ReadyResource {
     this.peering.addAutobaseBackground(this.base)
   }
 
-  async add(key, value) {
-    await this.base.append(encode('@autopass/put', { key, value }))
+  async add(key, value, file) {
+    await this.base.append(encode('@autopass/put', { key, value, file }))
   }
 
-  async addFile(key, file) {
-    await this.base.append(encode('@autopass/put', { key, file }))
-  }
-
-  async getFile(key) {
-    const data = await this.base.view.get('@autopass/records', { key })
-    if (data === null) {
-      return null
-    }
-    return data.file
+  async remove(key) {
+    await this.base.append(encode('@autopass/del', { key }))
   }
 
   async addMirror(key) {
@@ -345,9 +340,21 @@ class Autopass extends ReadyResource {
     const keyBuffer = enc.decode(enc.normalize(key))
     await this.base.append(encode('@autopass/del-mirror', { key: keyBuffer }))
   }
-
-  async remove(key) {
-    await this.base.append(encode('@autopass/del', { key }))
+  
+  async suspend() {
+    if (this.swarm) {
+      await this.pairing.suspend()
+      await this.swarm.suspend()
+      await this.store.suspend()
+    }
+  }  
+  
+  async resume() {
+    if (this.swarm) {
+      await this.store.resume()
+      await this.swarm.resume()
+      await this.pairing.resume()
+    }
   }
 } // end class
 

@@ -24,3 +24,10 @@ function onupdate() {
   console.log('db changed, all entries:')
   pass.list().on('data', console.log)
 }
+console.log('Before suspend: ', pass.swarm.peers.size)
+await pass.suspend()
+console.log('After suspend:', pass.swarm.peers.size)
+await pass.resume()
+setInterval(() => {
+  console.log('After resume: ', pass.swarm.peers.size)
+}, 2000)

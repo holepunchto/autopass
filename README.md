@@ -59,21 +59,13 @@ Triggered when it updates, ie something added/removed an entry
 
 Get an entry.
 
-#### `value = await pass.getFile(name)`
-
-Get a file.
-
 #### `stream = pass.list()`
 
 Get all entries.
 
-#### `await pass.add(key, value)`
+#### `await pass.add(key, value, file)`
 
 Add new entry
-
-#### `await pass.addFile(name, buffer)`
-
-Add new file
 
 #### `await pass.remove(key)`
 
@@ -130,6 +122,14 @@ Force close the pair instance. Only need to call this if you dont wait for it to
 #### `await pass.close()`
 
 Fully close the pass instance.
+
+#### `await pass.suspend()`
+
+Suspend the swarm and discovery
+
+#### `await pass.resume`
+
+Resume the swarm is suspended
 
 ## Contributors
 
