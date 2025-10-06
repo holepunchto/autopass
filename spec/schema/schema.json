@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 1,
   "schema": [
     {
       "name": "records",
@@ -23,7 +23,21 @@
           "name": "file",
           "required": false,
           "type": "buffer",
-          "version": 2
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "mirrors",
+      "namespace": "autopass",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "key",
+          "required": true,
+          "type": "fixed32",
+          "version": 1
         }
       ]
     },
@@ -97,6 +111,20 @@
           "name": "id",
           "required": true,
           "type": "buffer",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "del-mirror",
+      "namespace": "autopass",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "key",
+          "required": true,
+          "type": "fixed32",
           "version": 1
         }
       ]

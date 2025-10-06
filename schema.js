@@ -27,7 +27,17 @@ template.register({
     }
   ]
 })
-
+template.register({
+  name: 'mirrors',
+  compact: false,
+  fields: [
+    {
+      name: 'key',
+      type: 'fixed32',
+      required: true
+    }
+  ]
+})
 template.register({
   name: 'writer',
   compact: false,
@@ -90,6 +100,17 @@ template.register({
     }
   ]
 })
+template.register({
+  name: 'del-mirror',
+  compact: false,
+  fields: [
+    {
+      name: 'key',
+      type: 'fixed32',
+      required: true
+    }
+  ]
+})
 Hyperschema.toDisk(autopass)
 
 const dbTemplate = HyperdbBuilder.from('./spec/schema', './spec/db')
@@ -103,6 +124,11 @@ blobs.collections.register({
   name: 'invite',
   schema: '@autopass/invite',
   key: ['id']
+})
+blobs.collections.register({
+  name: 'mirrors',
+  schema: '@autopass/mirrors',
+  key: ['key']
 })
 blobs.collections.register({
   name: 'writer',
@@ -121,7 +147,16 @@ blobs.collections.register({
   schema: '@autopass/del-invite',
   key: ['id']
 })
-
+blobs.collections.register({
+  name: 'del-invite',
+  schema: '@autopass/del-invite',
+  key: ['id']
+})
+blobs.collections.register({
+  name: 'del-mirror',
+  schema: '@autopass/del-mirror',
+  key: ['key']
+})
 HyperdbBuilder.toDisk(dbTemplate)
 
 const hyperdispatch = Hyperdispatch.from(
@@ -140,6 +175,14 @@ namespace.register({
 namespace.register({
   name: 'put',
   requestType: '@autopass/records'
+})
+namespace.register({
+  name: 'add-mirror',
+  requestType: '@autopass/mirrors'
+})
+namespace.register({
+  name: 'del-mirror',
+  requestType: '@autopass/del-mirror'
 })
 namespace.register({
   name: 'del',

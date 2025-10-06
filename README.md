@@ -103,6 +103,18 @@ Pair with another instance.
 
 Wait for the pair to finish.
 
+#### `await pass.addMirror(key)`
+
+Add a blind mirror.
+
+#### `await getMirror()`
+
+Returns an array of blind mirrors
+
+#### `await removeMirror(key)`
+
+Remove a blind mirror
+
 #### `await pair.close()`
 
 Force close the pair instance. Only need to call this if you dont wait for it to finish.get
