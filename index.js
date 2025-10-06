@@ -340,15 +340,15 @@ class Autopass extends ReadyResource {
     const keyBuffer = enc.decode(enc.normalize(key))
     await this.base.append(encode('@autopass/del-mirror', { key: keyBuffer }))
   }
-  
+
   async suspend() {
     if (this.swarm) {
       await this.pairing.suspend()
       await this.swarm.suspend()
       await this.store.suspend()
     }
-  }  
-  
+  }
+
   async resume() {
     if (this.swarm) {
       await this.store.resume()
