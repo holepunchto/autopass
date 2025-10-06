@@ -44,13 +44,13 @@ const encoding0 = {
 // @autopass/mirrors
 const encoding1 = {
   preencode(state, m) {
-    c.string.preencode(state, m.key)
+    c.fixed32.preencode(state, m.key)
   },
   encode(state, m) {
-    c.string.encode(state, m.key)
+    c.fixed32.encode(state, m.key)
   },
   decode(state) {
-    const r0 = c.string.decode(state)
+    const r0 = c.fixed32.decode(state)
 
     return {
       key: r0
@@ -76,7 +76,21 @@ const encoding2 = {
 }
 
 // @autopass/delete
-const encoding3 = encoding1
+const encoding3 = {
+  preencode(state, m) {
+    c.string.preencode(state, m.key)
+  },
+  encode(state, m) {
+    c.string.encode(state, m.key)
+  },
+  decode(state) {
+    const r0 = c.string.decode(state)
+
+    return {
+      key: r0
+    }
+  }
+}
 
 // @autopass/invite
 const encoding4 = {

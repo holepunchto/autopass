@@ -33,7 +33,7 @@ template.register({
   fields: [
     {
       name: 'key',
-      type: 'string',
+      type: 'fixed32',
       required: true
     }
   ]
@@ -106,7 +106,7 @@ template.register({
   fields: [
     {
       name: 'key',
-      type: 'string',
+      type: 'fixed32',
       required: true
     }
   ]

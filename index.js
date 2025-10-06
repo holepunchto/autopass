@@ -7,9 +7,10 @@ const Hyperswarm = require('hyperswarm')
 const ReadyResource = require('ready-resource')
 const z32 = require('z32')
 const b4a = require('b4a')
-const { Router, encode } = require('./spec/hyperdispatch')
+const { Router, encode, decode } = require('./spec/hyperdispatch')
 const BlindPeering = require('blind-peering')
 const db = require('./spec/db/index.js')
+const enc = require('hypercore-id-encoding')
 
 class AutopassPairer extends ReadyResource {
   constructor(store, invite, opts = {}) {
@@ -327,16 +328,22 @@ class Autopass extends ReadyResource {
   }
 
   async addMirror(key) {
-    await this.base.append(encode('@autopass/add-mirror', { key }))
+    const keyBuffer = enc.decode(enc.normalize(key))
+    await this.base.append(encode('@autopass/add-mirror', { key: keyBuffer }))
   }
 
   async getMirror() {
     const queryStream = this.base.view.find('@autopass/mirrors', {})
-    return await queryStream.toArray()
+    const results = await queryStream.toArray()
+    return results.map((r) => ({
+      ...r,
+      key: enc.encode(r.key)
+    }))
   }
 
   async removeMirror(key) {
-    await this.base.append(encode('@autopass/del-mirror', { key }))
+    const keyBuffer = enc.decode(enc.normalize(key))
+    await this.base.append(encode('@autopass/del-mirror', { key: keyBuffer }))
   }
 
   async remove(key) {

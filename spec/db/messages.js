@@ -44,13 +44,13 @@ const encoding0 = {
 // @autopass/mirrors
 const encoding1 = {
   preencode(state, m) {
-    c.string.preencode(state, m.key)
+    c.fixed32.preencode(state, m.key)
   },
   encode(state, m) {
-    c.string.encode(state, m.key)
+    c.fixed32.encode(state, m.key)
   },
   decode(state) {
-    const r0 = c.string.decode(state)
+    const r0 = c.fixed32.decode(state)
 
     return {
       key: r0
@@ -76,7 +76,21 @@ const encoding2 = {
 }
 
 // @autopass/delete
-const encoding3 = encoding1
+const encoding3 = {
+  preencode(state, m) {
+    c.string.preencode(state, m.key)
+  },
+  encode(state, m) {
+    c.string.encode(state, m.key)
+  },
+  decode(state) {
+    const r0 = c.string.decode(state)
+
+    return {
+      key: r0
+    }
+  }
+}
 
 // @autopass/invite
 const encoding4 = {
@@ -180,7 +194,7 @@ const encoding8 = {
   }
 }
 
-// @autopass/writer/hyperdb#2
+// @autopass/mirrors/hyperdb#2
 const encoding9 = {
   preencode(state, m) {},
   encode(state, m) {},
@@ -191,11 +205,14 @@ const encoding9 = {
   }
 }
 
-// @autopass/delete/hyperdb#3
+// @autopass/writer/hyperdb#3
 const encoding10 = encoding9
 
-// @autopass/del-invite/hyperdb#4
-const encoding11 = {
+// @autopass/delete/hyperdb#4
+const encoding11 = encoding9
+
+// @autopass/del-invite/hyperdb#5
+const encoding12 = {
   preencode(state, m) {},
   encode(state, m) {},
   decode(state) {
@@ -205,10 +222,7 @@ const encoding11 = {
   }
 }
 
-// @autopass/del-mirror/hyperdb#5
-const encoding12 = encoding9
-
-// @autopass/mirrors/hyperdb#6
+// @autopass/del-mirror/hyperdb#6
 const encoding13 = encoding9
 
 function setVersion(v) {
@@ -252,15 +266,15 @@ function getEncoding(name) {
       return encoding7
     case '@autopass/invite/hyperdb#1':
       return encoding8
-    case '@autopass/writer/hyperdb#2':
+    case '@autopass/mirrors/hyperdb#2':
       return encoding9
-    case '@autopass/delete/hyperdb#3':
+    case '@autopass/writer/hyperdb#3':
       return encoding10
-    case '@autopass/del-invite/hyperdb#4':
+    case '@autopass/delete/hyperdb#4':
       return encoding11
-    case '@autopass/del-mirror/hyperdb#5':
+    case '@autopass/del-invite/hyperdb#5':
       return encoding12
-    case '@autopass/mirrors/hyperdb#6':
+    case '@autopass/del-mirror/hyperdb#6':
       return encoding13
     default:
       throw new Error('Encoder not found ' + name)
