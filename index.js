@@ -25,6 +25,7 @@ class AutopassPairer extends ReadyResource {
     this.onresolve = null
     this.onreject = null
     this.pass = null
+    this.relayThrough = opts.relayThrough || null
 
     this.ready().catch(noop)
   }
@@ -33,7 +34,8 @@ class AutopassPairer extends ReadyResource {
     await this.store.ready()
     this.swarm = new Hyperswarm({
       keyPair: await this.store.createKeyPair('hyperswarm'),
-      bootstrap: this.bootstrap
+      bootstrap: this.bootstrap,
+      relayThrough: this.relayThrough
     })
 
     const store = this.store
