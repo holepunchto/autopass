@@ -285,7 +285,7 @@ class Autopass extends ReadyResource {
         bootstrap: this.bootstrap
       })
       this.swarm.on('connection', (connection, peerInfo) => {
-        this.store.replicate(connection)
+        this.base.replicate(connection)
       })
     }
     this.pairing = new BlindPairing(this.swarm)
