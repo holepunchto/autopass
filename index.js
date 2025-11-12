@@ -4,6 +4,7 @@ const Autobase = require('autobase')
 const BlindPairing = require('blind-pairing')
 const HyperDB = require('hyperdb')
 const Hyperswarm = require('hyperswarm')
+const Wakeup = require('protomux-wakeup')
 const ReadyResource = require('ready-resource')
 const z32 = require('z32')
 const b4a = require('b4a')
@@ -18,6 +19,7 @@ class AutopassPairer extends ReadyResource {
     this.store = store
     this.invite = invite
     this.swarm = null
+    this.wakeup = null
     this.pairing = null
     this.peering = null
     this.candidate = null
@@ -38,9 +40,12 @@ class AutopassPairer extends ReadyResource {
       relayThrough: this.relayThrough
     })
 
+    this.wakeup = new Wakeup()
+
     const store = this.store
     this.swarm.on('connection', (connection, peerInfo) => {
       store.replicate(connection)
+      this.wakeup.addStream(connection)
     })
 
     this.pairing = new BlindPairing(this.swarm)
@@ -56,6 +61,7 @@ class AutopassPairer extends ReadyResource {
           this.pass = new Autopass(this.store, {
             swarm: this.swarm,
             key: result.key,
+            wakeup: this.wakeup,
             encryptionKey: result.encryptionKey,
             bootstrap: this.bootstrap
           })
@@ -84,6 +90,10 @@ class AutopassPairer extends ReadyResource {
   async _close() {
     if (this.candidate !== null) {
       await this.candidate.close()
+    }
+
+    if (this.wakeup !== null) {
+      this.wakeup.destroy()
     }
 
     if (this.swarm !== null) {
@@ -160,9 +170,10 @@ class Autopass extends ReadyResource {
 
   // Initialize autobase
   _boot(opts = {}) {
-    const { encryptionKey, key } = opts
+    const { encryptionKey, key, wakeup } = opts
 
     this.base = new Autobase(this.store, key, {
+      wakeup,
       encrypt: true,
       encryptionKey,
       open(store) {
