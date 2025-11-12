@@ -322,6 +322,7 @@ class Autopass extends ReadyResource {
     const mirrorList = await this.getMirror()
     const mirrors = mirrorList.map((item) => item.key)
     this.peering = new BlindPeering(this.swarm, this.store, {
+      wakeup: this.base.wakeupProtocol,
       autobaseMirrors: mirrors
     })
     this.peering.addAutobaseBackground(this.base)
