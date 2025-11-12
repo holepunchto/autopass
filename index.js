@@ -317,7 +317,7 @@ class Autopass extends ReadyResource {
   }
 
   async add(key, value, file) {
-    if (b4a.byteLength(file) > 6 * 1024 * 1024) {
+    if (file && (file.byteLength > 6 * 1024 * 1024)) {
       throw new Error('File length should be less than 6 MB')
     }
     await this.base.append(encode('@autopass/put', { key, value, file }))
