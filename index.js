@@ -123,6 +123,7 @@ class Autopass extends ReadyResource {
   constructor(corestore, opts = {}) {
     super()
     this.router = new Router()
+    this.relayThrough = opts.relayThrough || null
     this.store = corestore
     this.swarm = opts.swarm || null
     this.base = null
@@ -293,7 +294,8 @@ class Autopass extends ReadyResource {
     if (this.swarm === null) {
       this.swarm = new Hyperswarm({
         keyPair: await this.store.createKeyPair('hyperswarm'),
-        bootstrap: this.bootstrap
+        bootstrap: this.bootstrap,
+        relayThrough: this.relayThrough
       })
       this.swarm.on('connection', (connection, peerInfo) => {
         this.base.replicate(connection)
