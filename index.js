@@ -237,6 +237,7 @@ class Autopass extends ReadyResource {
     if (this.opened === false) await this.ready()
     const existing = await this.base.view.findOne('@autopass/invite', {})
     if (existing) {
+      if (this.member) await this.member.flushed()
       return z32.encode(existing.invite)
     }
     const { id, invite, publicKey, expires } = BlindPairing.createInvite(
