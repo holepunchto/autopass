@@ -245,6 +245,7 @@ class Autopass extends ReadyResource {
 
     const record = { id, invite, publicKey, expires }
     await this.base.append(encode('@autopass/add-invite', record))
+    if (this.member) await this.member.flushed()
     return z32.encode(record.invite)
   }
 
