@@ -240,9 +240,7 @@ class Autopass extends ReadyResource {
       if (this.member) await this.member.flushed()
       return z32.encode(existing.invite)
     }
-    const { id, invite, publicKey, expires } = BlindPairing.createInvite(
-      this.base.key
-    )
+    const { id, invite, publicKey, expires } = BlindPairing.createInvite(this.base.key)
 
     const record = { id, invite, publicKey, expires }
     await this.base.append(encode('@autopass/add-invite', record))

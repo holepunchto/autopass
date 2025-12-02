@@ -47,40 +47,20 @@ class Router {
         this._handler7 = handler
         break
       default:
-        throw new Error(
-          'Cannot register a handler for a nonexistent route: ' + name
-        )
+        throw new Error('Cannot register a handler for a nonexistent route: ' + name)
     }
     this._missing--
   }
 
   _checkAll() {
-    assert(
-      this._handler0 !== null,
-      'Missing handler for "@autopass/remove-writer"'
-    )
-    assert(
-      this._handler1 !== null,
-      'Missing handler for "@autopass/add-writer"'
-    )
+    assert(this._handler0 !== null, 'Missing handler for "@autopass/remove-writer"')
+    assert(this._handler1 !== null, 'Missing handler for "@autopass/add-writer"')
     assert(this._handler2 !== null, 'Missing handler for "@autopass/put"')
-    assert(
-      this._handler3 !== null,
-      'Missing handler for "@autopass/add-mirror"'
-    )
-    assert(
-      this._handler4 !== null,
-      'Missing handler for "@autopass/del-mirror"'
-    )
+    assert(this._handler3 !== null, 'Missing handler for "@autopass/add-mirror"')
+    assert(this._handler4 !== null, 'Missing handler for "@autopass/del-mirror"')
     assert(this._handler5 !== null, 'Missing handler for "@autopass/del"')
-    assert(
-      this._handler6 !== null,
-      'Missing handler for "@autopass/add-invite"'
-    )
-    assert(
-      this._handler7 !== null,
-      'Missing handler for "@autopass/del-invite"'
-    )
+    assert(this._handler6 !== null, 'Missing handler for "@autopass/add-invite"')
+    assert(this._handler7 !== null, 'Missing handler for "@autopass/del-invite"')
   }
 
   async dispatch(message, context) {

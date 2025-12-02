@@ -159,10 +159,7 @@ blobs.collections.register({
 })
 HyperdbBuilder.toDisk(dbTemplate)
 
-const hyperdispatch = Hyperdispatch.from(
-  './spec/schema',
-  './spec/hyperdispatch'
-)
+const hyperdispatch = Hyperdispatch.from('./spec/schema', './spec/hyperdispatch')
 const namespace = hyperdispatch.namespace('autopass')
 namespace.register({
   name: 'remove-writer',
