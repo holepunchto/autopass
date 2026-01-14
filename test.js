@@ -3,15 +3,69 @@ const Autopass = require('./')
 const Corestore = require('corestore')
 const testnet = require('hyperdht/testnet')
 const tmp = require('test-tmp')
+const b4a = require('b4a')
+const { encode } = require('./spec/hyperdispatch')
 
 test('basic', async function (t) {
   const a = await create(t, { replicate: false })
 
   await a.add('hello', 'world')
 
-  t.ok(a.base.encryptionKey)
+  t.ok(a.encryptionKey)
   t.is((await a.get('hello')).value, 'world')
 
+  await a.close()
+})
+
+test('decryption fails gracefully with wrong key', async function (t) {
+  const dir = await tmp(t)
+  const a = new Autopass(new Corestore(dir), { encryptionKey: 'correct' })
+  await a.ready()
+  await a.add('secret', 'value')
+  await a.close()
+
+  const b = new Autopass(new Corestore(dir), { encryptionKey: 'wrong' })
+  await b.ready()
+  const result = await b.get('secret')
+  t.is(result.value, null)
+  await b.close()
+})
+
+test('keyProvider persists generated key', async function (t) {
+  const dir = await tmp(t)
+  let stored = null
+  let setCalled = false
+  const provider = {
+    async getKey() {
+      return stored
+    },
+    async setKey(key) {
+      stored = key
+      setCalled = true
+    },
+    async clearKey() {
+      stored = null
+    }
+  }
+
+  const a = new Autopass(new Corestore(dir), { keyProvider: provider })
+  await a.ready()
+  await a.add('hello', 'provider')
+  await a.close()
+
+  const b = new Autopass(new Corestore(dir), { keyProvider: provider })
+  await b.ready()
+  t.ok(setCalled)
+  t.is((await b.get('hello')).value, 'provider')
+  await b.close()
+})
+
+test('plaintext compatibility', async function (t) {
+  const dir = await tmp(t)
+  const a = new Autopass(new Corestore(dir), { encryptionKey: 'compat' })
+  await a.ready()
+  await a.base.append(encode('@autopass/put', { key: 'plain', value: 'text' }))
+  t.is((await a.get('plain')).value, 'text')
   await a.close()
 })
 
@@ -128,7 +182,10 @@ test('suspend and resume', async function (t) {
 
 async function create(t, opts) {
   const dir = await tmp(t)
-  const a = new Autopass(new Corestore(dir), opts)
+  const a = new Autopass(new Corestore(dir), {
+    encryptionKey: b4a.from('test-encryption-key'),
+    ...opts
+  })
   await a.ready()
   return a
 }

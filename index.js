@@ -8,10 +8,103 @@ const Wakeup = require('protomux-wakeup')
 const ReadyResource = require('ready-resource')
 const z32 = require('z32')
 const b4a = require('b4a')
+const crypto = require('crypto')
 const { Router, encode, decode } = require('./spec/hyperdispatch')
 const BlindPeering = require('blind-peering')
 const db = require('./spec/db/index.js')
 const enc = require('hypercore-id-encoding')
+
+const VALUE_PREFIX = 'ap01:'
+const FILE_PREFIX = b4a.from('AP01')
+const IV_BYTES = 12
+const TAG_BYTES = 16
+const ENCRYPTION_KEY_BYTES = 32
+const DEFAULT_KDF_SALT = b4a.from('autopass-default-salt')
+
+class InMemoryKeyProvider {
+  constructor() {
+    this._key = null
+  }
+
+  async getKey() {
+    return this._key
+  }
+
+  async setKey(key) {
+    this._key = key
+  }
+
+  async clearKey() {
+    this._key = null
+  }
+}
+
+function normalizeEncryptionKey(key, salt) {
+  if (!key) return null
+  const buf = b4a.isBuffer(key) ? key : b4a.from(String(key))
+  if (buf.length === ENCRYPTION_KEY_BYTES) return buf
+  const kdfSalt = salt || DEFAULT_KDF_SALT
+  return crypto.scryptSync(buf, kdfSalt, ENCRYPTION_KEY_BYTES)
+}
+
+function encryptString(value, key) {
+  if (value === null || value === undefined) return value
+  if (typeof value !== 'string') {
+    throw new Error('value must be a string when encryption is enabled')
+  }
+  const iv = crypto.randomBytes(IV_BYTES)
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv)
+  const ciphertext = Buffer.concat([cipher.update(value, 'utf8'), cipher.final()])
+  const tag = cipher.getAuthTag()
+  const payload = Buffer.concat([iv, tag, ciphertext]).toString('base64')
+  return VALUE_PREFIX + payload
+}
+
+function decryptString(value, key) {
+  if (value === null || value === undefined) return value
+  if (typeof value !== 'string' || !value.startsWith(VALUE_PREFIX)) return value
+  try {
+    const payload = Buffer.from(value.slice(VALUE_PREFIX.length), 'base64')
+    const iv = payload.subarray(0, IV_BYTES)
+    const tag = payload.subarray(IV_BYTES, IV_BYTES + TAG_BYTES)
+    const ciphertext = payload.subarray(IV_BYTES + TAG_BYTES)
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv)
+    decipher.setAuthTag(tag)
+    const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()])
+    return plaintext.toString('utf8')
+  } catch {
+    return null
+  }
+}
+
+function encryptBuffer(value, key) {
+  if (!value) return value
+  if (!b4a.isBuffer(value)) {
+    throw new Error('file must be a buffer when encryption is enabled')
+  }
+  const iv = crypto.randomBytes(IV_BYTES)
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv)
+  const ciphertext = Buffer.concat([cipher.update(value), cipher.final()])
+  const tag = cipher.getAuthTag()
+  return Buffer.concat([FILE_PREFIX, iv, tag, ciphertext])
+}
+
+function decryptBuffer(value, key) {
+  if (!value || !b4a.isBuffer(value)) return value
+  if (value.length < FILE_PREFIX.length + IV_BYTES + TAG_BYTES) return value
+  if (!b4a.equals(value.subarray(0, FILE_PREFIX.length), FILE_PREFIX)) return value
+  try {
+    const start = FILE_PREFIX.length
+    const iv = value.subarray(start, start + IV_BYTES)
+    const tag = value.subarray(start + IV_BYTES, start + IV_BYTES + TAG_BYTES)
+    const ciphertext = value.subarray(start + IV_BYTES + TAG_BYTES)
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv)
+    decipher.setAuthTag(tag)
+    return Buffer.concat([decipher.update(ciphertext), decipher.final()])
+  } catch {
+    return null
+  }
+}
 
 class AutopassPairer extends ReadyResource {
   constructor(store, invite, opts = {}) {
@@ -28,6 +121,8 @@ class AutopassPairer extends ReadyResource {
     this.onreject = null
     this.pass = null
     this.relayThrough = opts.relayThrough || null
+    this.encryptionKey = opts.encryptionKey || null
+    this.keyProvider = opts.keyProvider || null
 
     this.ready().catch(noop)
   }
@@ -62,7 +157,8 @@ class AutopassPairer extends ReadyResource {
             swarm: this.swarm,
             key: result.key,
             wakeup: this.wakeup,
-            encryptionKey: result.encryptionKey,
+            encryptionKey: this.encryptionKey || result.encryptionKey,
+            keyProvider: this.keyProvider,
             bootstrap: this.bootstrap
           })
 
@@ -132,6 +228,9 @@ class Autopass extends ReadyResource {
     this.pairing = null
     this.replicate = opts.replicate !== false
     this.debug = !!opts.key
+    this._providedKey = opts.encryptionKey || null
+    this._keyProvider = opts.keyProvider || new InMemoryKeyProvider()
+    this._encryptionKey = null
     // Register handlers for commands
     this.router.add('@autopass/remove-writer', async (data, context) => {
       await context.base.removeWriter(data.key)
@@ -171,12 +270,10 @@ class Autopass extends ReadyResource {
 
   // Initialize autobase
   _boot(opts = {}) {
-    const { encryptionKey, key, wakeup } = opts
+    const { key, wakeup } = opts
 
     this.base = new Autobase(this.store, key, {
       wakeup,
-      encrypt: true,
-      encryptionKey,
       open(store) {
         return HyperDB.bee(store.get('view'), db, {
           extension: false,
@@ -200,6 +297,7 @@ class Autopass extends ReadyResource {
   }
 
   async _open() {
+    await this._ensureEncryptionKey()
     await this.base.ready()
     if (this.replicate) await this._replicate()
   }
@@ -226,7 +324,25 @@ class Autopass extends ReadyResource {
   }
 
   get encryptionKey() {
-    return this.base.encryptionKey
+    return this._encryptionKey
+  }
+
+  async _ensureEncryptionKey() {
+    if (this._encryptionKey) return
+    if (this._providedKey) {
+      this._encryptionKey = normalizeEncryptionKey(this._providedKey, this.base.key)
+      return
+    }
+    const candidate = this._keyProvider ? await this._keyProvider.getKey() : null
+    if (candidate) {
+      this._encryptionKey = normalizeEncryptionKey(candidate, this.base.key)
+      return
+    }
+    const generated = crypto.randomBytes(ENCRYPTION_KEY_BYTES)
+    this._encryptionKey = generated
+    if (this._keyProvider && this._keyProvider.setKey) {
+      await this._keyProvider.setKey(generated)
+    }
   }
 
   static pair(store, invite, opts) {
@@ -260,12 +376,27 @@ class Autopass extends ReadyResource {
     return this.base.view.find('@autopass/records', {})
   }
 
+  async listDecrypted() {
+    const queryStream = this.base.view.find('@autopass/records', {})
+    const results = await queryStream.toArray()
+    if (!this._encryptionKey) return results
+    return results.map((record) => ({
+      ...record,
+      value: decryptString(record.value, this._encryptionKey),
+      file: decryptBuffer(record.file, this._encryptionKey)
+    }))
+  }
+
   async get(key) {
     const data = await this.base.view.get('@autopass/records', { key })
     if (data === null) {
       return null
     }
-    return { value: data.value, file: data.file }
+    if (!this._encryptionKey) return { value: data.value, file: data.file }
+    return {
+      value: decryptString(data.value, this._encryptionKey),
+      file: decryptBuffer(data.file, this._encryptionKey)
+    }
   }
 
   async addWriter(key) {
@@ -314,7 +445,7 @@ class Autopass extends ReadyResource {
         await this.addWriter(candidate.userData)
         candidate.confirm({
           key: this.base.key,
-          encryptionKey: this.base.encryptionKey
+          encryptionKey: this._encryptionKey
         })
         await this.deleteInvite()
       }
@@ -334,7 +465,9 @@ class Autopass extends ReadyResource {
     if (file && file.byteLength > 6 * 1024 * 1024) {
       throw new Error('File length should be less than 6 MB')
     }
-    await this.base.append(encode('@autopass/put', { key, value, file }))
+    const nextValue = this._encryptionKey ? encryptString(value, this._encryptionKey) : value
+    const nextFile = this._encryptionKey ? encryptBuffer(file, this._encryptionKey) : file
+    await this.base.append(encode('@autopass/put', { key, value: nextValue, file: nextFile }))
   }
 
   async remove(key) {
@@ -378,5 +511,7 @@ class Autopass extends ReadyResource {
 } // end class
 
 function noop() {}
+
+Autopass.InMemoryKeyProvider = InMemoryKeyProvider
 
 module.exports = Autopass

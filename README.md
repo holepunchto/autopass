@@ -17,7 +17,9 @@ First choose if you wanna pair or make a new instance.
 import Autopass from 'autopass'
 import Corestore from 'corestore'
 
-const pass = new Autopass(new Corestore('./pass'))
+const pass = new Autopass(new Corestore('./pass'), {
+  encryptionKey: 'your-secret-passphrase'
+})
 
 const inv = await pass.createInvite()
 console.log('share to add', inv)
@@ -47,9 +49,32 @@ console.log({ note })
 
 ## API
 
-#### `pass = new Autopass(new Corestore(path))`
+#### `pass = new Autopass(new Corestore(path), [opts])`
 
 Make a new pass instance.
+
+Options:
+
+- `encryptionKey` (string or buffer): Enables entry-level encryption for values/files. The key is not persisted to disk, so callers must supply it every time they open the store.
+- `keyProvider` (object): Optional async key provider with `getKey()`, `setKey(key)`, `clearKey()` used when `encryptionKey` is not supplied.
+  - When neither is supplied, Autopass generates an in-memory key (entries will be unreadable after restart unless the caller persists the key).
+  - Passphrases are derived with `scrypt` using the vault key as salt; raw 32-byte keys are used directly.
+
+Example key provider interface:
+
+```js
+const keyProvider = {
+  async getKey() {
+    return await loadFromSecureStore()
+  },
+  async setKey(key) {
+    await saveToSecureStore(key)
+  },
+  async clearKey() {
+    await deleteFromSecureStore()
+  }
+}
+```
 
 #### `pass.on('update', fn)`
 
@@ -62,6 +87,15 @@ Get an entry.
 #### `stream = pass.list()`
 
 Get all entries.
+
+#### `entries = await pass.listDecrypted()`
+
+Get all entries with decrypted values/files when entry-level encryption is enabled.
+If decryption fails (wrong key), `value`/`file` will be `null`.
+
+#### `Autopass.InMemoryKeyProvider`
+
+Default key provider implementation that keeps keys in memory only.
 
 #### `await pass.add(key, value, file)`
 
@@ -98,6 +132,7 @@ Wait for the pass to load fully
 #### `pair = Autopass.pair(new Corestore(path), invite)`
 
 Pair with another instance.
+If `encryptionKey` or `keyProvider` is provided, the pair instance will prefer those; otherwise it uses the key sent by the inviter.
 
 #### `pass = await pair.finished()`
 
