@@ -32,6 +32,7 @@
   "dependencies": {
     "autobase": "^7.19.4",
     "b4a": "^1.7.1",
+    "blind-encryption-sodium": "^1.0.2",
     "blind-pairing": "^2.3.1",
     "blind-peering": "^1.13.0",
     "corestore": "^7.4.7",
