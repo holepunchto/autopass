@@ -28,6 +28,7 @@ class AutopassPairer extends ReadyResource {
     this.onreject = null
     this.pass = null
     this.relayThrough = opts.relayThrough || null
+    this.blindEncryption = opts.blindEncryption || null
 
     this.ready().catch(noop)
   }
@@ -63,7 +64,8 @@ class AutopassPairer extends ReadyResource {
             key: result.key,
             wakeup: this.wakeup,
             encryptionKey: result.encryptionKey,
-            bootstrap: this.bootstrap
+            bootstrap: this.bootstrap,
+            blindEncryption: this.blindEncryption
           })
 
           await this.pass.deleteInvite()
@@ -171,12 +173,13 @@ class Autopass extends ReadyResource {
 
   // Initialize autobase
   _boot(opts = {}) {
-    const { encryptionKey, key, wakeup } = opts
+    const { encryptionKey, key, wakeup, blindEncryption } = opts
 
     this.base = new Autobase(this.store, key, {
       wakeup,
       encrypt: true,
       encryptionKey,
+      blindEncryption,
       open(store) {
         return HyperDB.bee(store.get('view'), db, {
           extension: false,
