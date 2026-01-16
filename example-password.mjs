@@ -7,18 +7,15 @@ const store = new Corestore('example/' + process.argv[2])
 
 let pass = null
 
-const encryptionKey = b4a.from('hello world', 'utf-8')
-const password = b4a.fill(32, 'password')
+const password = b4a.alloc(32, 'password')
 
 if (process.argv[3]) {
   const pair = Autopass.pair(store, process.argv[3], {
-    encryptionKey,
     blindEncryption: new BlindEncryptionSodium(password)
   })
   pass = await pair.finished()
 } else {
   pass = new Autopass(store, {
-    encryptionKey,
     blindEncryption: new BlindEncryptionSodium(password)
   })
   await pass.ready()
