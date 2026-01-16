@@ -81,7 +81,7 @@ test('invites', async function (t) {
   })
 })
 
-test.solo('blind encryption', async function (t) {
+test('blind encryption', async function (t) {
   t.plan(4)
 
   const password = b4a.alloc(32, 'password')
