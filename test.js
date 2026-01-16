@@ -3,6 +3,8 @@ const Autopass = require('./')
 const Corestore = require('corestore')
 const testnet = require('hyperdht/testnet')
 const tmp = require('test-tmp')
+const b4a = require('b4a')
+const BlindEncryptionSodium = require('blind-encryption-sodium')
 
 test('basic', async function (t) {
   const a = await create(t, { replicate: false })
@@ -72,6 +74,53 @@ test('invites', async function (t) {
 
   const b = await p.finished()
   await b.ready()
+
+  t.teardown(() => b.close())
+  b.on('update', function () {
+    if (b.base.system.members === 2) t.pass('b has two members')
+  })
+})
+
+test.solo('blind encryption', async function (t) {
+  t.plan(4)
+
+  const password = b4a.alloc(32, 'password')
+  const tn = await testnet(10, t)
+
+  const a = await create(t, {
+    bootstrap: tn.bootstrap,
+    blindEncryption: new BlindEncryptionSodium(password)
+  })
+  t.teardown(() => {
+    a.close()
+  })
+
+  const updateListener = function () {
+    if (a.base.system.members === 2) {
+      t.pass('a has two members')
+      a.removeListener('update', updateListener) // Remove the listener in teardown
+    }
+  }
+
+  a.on('update', updateListener)
+
+  const inv = await a.createInvite()
+
+  const p = await pair(t, inv, {
+    bootstrap: tn.bootstrap,
+    blindEncryption: new BlindEncryptionSodium(password)
+  })
+
+  const b = await p.finished()
+  await b.ready()
+
+  const [encryptionKeyBuffer, encryptionKeyEncryptedBuffer] = await Promise.all([
+    b.base.local.getUserData('autobase/encryption'),
+    b.base.local.getUserData('autobase/blind-encryption')
+  ])
+
+  t.absent(encryptionKeyBuffer)
+  t.ok(encryptionKeyEncryptedBuffer)
 
   t.teardown(() => b.close())
   b.on('update', function () {
