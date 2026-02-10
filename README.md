@@ -83,7 +83,7 @@ Add a writer explictly.
 
 Get the local writer key.
 
-#### `inv = await pass.createInvite()`
+#### `inv = await pass.createInvite({ readOnly })`
 
 Get invite to add a writer.
 

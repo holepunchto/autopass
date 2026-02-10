@@ -70,12 +70,25 @@ class AutopassPairer extends ReadyResource {
 
           await this.pass.deleteInvite()
         }
+        const readOnly = JSON.parse(result.data.toString()).readOnly
         this.swarm = null
         this.store = null
-        if (this.onresolve) this._whenWritable()
+        if (this.onresolve && readOnly) {
+          this._whenReadable()
+        } else if (this.onresolve) {
+          this._whenWritable()
+        }
         this.candidate.close().catch(noop)
       }
     })
+  }
+
+  _whenReadable() {
+    const check = () => {
+      this.pass.base.off('update', check)
+      this.onresolve(this.pass)
+    }
+    this.pass.base.on('update', check)
   }
 
   _whenWritable() {
@@ -238,14 +251,20 @@ class Autopass extends ReadyResource {
 
   async createInvite(opts) {
     if (this.opened === false) await this.ready()
+    const readOnly = opts?.readOnly ? true : false
     const existing = await this.base.view.findOne('@autopass/invite', {})
     if (existing) {
       if (this.member) await this.member.flushed()
       return z32.encode(existing.invite)
     }
-    const { id, invite, publicKey, expires } = BlindPairing.createInvite(this.base.key)
+    const { id, invite, publicKey, expires, additional } = BlindPairing.createInvite(
+      this.base.key,
+      {
+        data: Buffer.from(JSON.stringify({ readOnly }))
+      }
+    )
 
-    const record = { id, invite, publicKey, expires }
+    const record = { id, invite, publicKey, expires, readOnly, additional }
     await this.base.append(encode('@autopass/add-invite', record))
     if (this.member) await this.member.flushed()
     return z32.encode(record.invite)
@@ -313,11 +332,15 @@ class Autopass extends ReadyResource {
         if (inv === null || !b4a.equals(inv.id, id)) {
           return
         }
+        const readOnly = inv.readOnly
         candidate.open(inv.publicKey)
-        await this.addWriter(candidate.userData)
+        if (!readOnly) {
+          await this.addWriter(candidate.userData)
+        }
         candidate.confirm({
           key: this.base.key,
-          encryptionKey: this.base.encryptionKey
+          encryptionKey: this.base.encryptionKey,
+          additional: inv.additional
         })
         await this.deleteInvite()
       }
