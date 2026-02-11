@@ -253,7 +253,10 @@ class Autopass extends ReadyResource {
     if (this.opened === false) await this.ready()
     const readOnly = opts?.readOnly ? true : false
     const existing = await this.base.view.findOne('@autopass/invite', {})
-    if (existing) {
+
+    if (existing && existing.readOnly !== readOnly) {
+      await this.deleteInvite()
+    } else if (existing) {
       if (this.member) await this.member.flushed()
       return z32.encode(existing.invite)
     }

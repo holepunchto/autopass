@@ -81,6 +81,26 @@ test('invites', async function (t) {
   })
 })
 
+test('invite resets when createInvite type is different than previous', async function (t) {
+  t.plan(1)
+
+  const tn = await testnet(10, t)
+
+  const a = await create(t, { bootstrap: tn.bootstrap })
+  t.teardown(() => {
+    a.close()
+  })
+
+  const inv = await a.createInvite()
+  const invReadOnly = await a.createInvite({ readOnly: true })
+
+  if (inv !== invReadOnly) {
+    t.pass('invite is reset ')
+  } else {
+    t.fail()
+  }
+})
+
 test('blind encryption', async function (t) {
   t.plan(4)
 
