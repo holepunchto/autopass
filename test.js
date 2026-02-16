@@ -23,8 +23,8 @@ test('invites', async function (t) {
   const tn = await testnet(10, t)
 
   const a = await create(t, { bootstrap: tn.bootstrap })
-  t.teardown(() => {
-    a.close()
+  t.teardown(async () => {
+    await a.close()
   })
 
   const onUpdate = function () {
@@ -43,7 +43,7 @@ test('invites', async function (t) {
   const b = await p.finished()
   await b.ready()
 
-  t.teardown(() => b.close())
+  t.teardown(async () => await b.close())
   b.on('update', function () {
     if (b.base.system.members === 2) t.pass('b has two members')
   })
@@ -55,8 +55,8 @@ test('invites', async function (t) {
   const tn = await testnet(10, t)
 
   const a = await create(t, { bootstrap: tn.bootstrap })
-  t.teardown(() => {
-    a.close()
+  t.teardown(async () => {
+    await a.close()
   })
 
   const updateListener = function () {
@@ -75,10 +75,30 @@ test('invites', async function (t) {
   const b = await p.finished()
   await b.ready()
 
-  t.teardown(() => b.close())
+  t.teardown(async () => await b.close())
   b.on('update', function () {
     if (b.base.system.members === 2) t.pass('b has two members')
   })
+})
+
+test('invite resets when createInvite type is different than previous', async function (t) {
+  t.plan(1)
+
+  const tn = await testnet(10, t)
+
+  const a = await create(t, { bootstrap: tn.bootstrap })
+  t.teardown(async () => {
+    await a.close()
+  })
+
+  const inv = await a.createInvite()
+  const invReadOnly = await a.createInvite({ readOnly: true })
+
+  if (inv !== invReadOnly) {
+    t.pass('invite is reset ')
+  } else {
+    t.fail()
+  }
 })
 
 test('blind encryption', async function (t) {
@@ -91,8 +111,8 @@ test('blind encryption', async function (t) {
     bootstrap: tn.bootstrap,
     blindEncryption: new BlindEncryptionSodium(password)
   })
-  t.teardown(() => {
-    a.close()
+  t.teardown(async () => {
+    await a.close()
   })
 
   const updateListener = function () {
@@ -122,7 +142,7 @@ test('blind encryption', async function (t) {
   t.absent(encryptionKeyBuffer)
   t.ok(encryptionKeyEncryptedBuffer)
 
-  t.teardown(() => b.close())
+  t.teardown(async () => await b.close())
   b.on('update', function () {
     if (b.base.system.members === 2) t.pass('b has two members')
   })
@@ -135,12 +155,12 @@ test('suspend and resume', async function (t) {
 
   const a = await create(t, { bootstrap: tn.bootstrap })
   const inv = await a.createInvite()
-  t.teardown(() => a.close())
+  t.teardown(async () => await a.close())
 
   const p = await pair(t, inv, { bootstrap: tn.bootstrap })
   const b = await p.finished()
   await b.ready()
-  t.teardown(() => b.close())
+  t.teardown(async () => await b.close())
 
   await new Promise((resolve) => {
     const check = () => {

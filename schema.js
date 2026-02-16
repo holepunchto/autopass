@@ -63,6 +63,14 @@ template.register({
 })
 
 template.register({
+  name: 'additional-invite-data',
+  fields: [
+    { name: 'data', type: 'buffer', required: true },
+    { name: 'signature', type: 'buffer', required: true }
+  ]
+})
+
+template.register({
   name: 'invite',
   compact: false,
   fields: [
@@ -85,6 +93,16 @@ template.register({
       name: 'expires',
       type: 'int',
       required: true
+    },
+    {
+      name: 'readOnly',
+      type: 'bool',
+      required: true
+    },
+    {
+      name: 'additional',
+      type: '@autopass/additional-invite-data',
+      required: false
     }
   ]
 })

@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 3,
   "schema": [
     {
       "name": "records",
@@ -73,7 +73,7 @@
       "name": "invite",
       "namespace": "autopass",
       "compact": false,
-      "flagsPosition": -1,
+      "flagsPosition": 4,
       "fields": [
         {
           "name": "id",
@@ -98,6 +98,18 @@
           "required": true,
           "type": "int",
           "version": 1
+        },
+        {
+          "name": "readOnly",
+          "required": false,
+          "type": "bool",
+          "version": 2
+        },
+        {
+          "name": "additional",
+          "required": false,
+          "type": "@autopass/additional-invite-data",
+          "version": 3
         }
       ]
     },
@@ -126,6 +138,26 @@
           "required": true,
           "type": "fixed32",
           "version": 1
+        }
+      ]
+    },
+    {
+      "name": "additional-invite-data",
+      "namespace": "autopass",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "data",
+          "required": true,
+          "type": "buffer",
+          "version": 3
+        },
+        {
+          "name": "signature",
+          "required": true,
+          "type": "buffer",
+          "version": 3
         }
       ]
     }
