@@ -97,7 +97,7 @@ template.register({
     {
       name: 'readOnly',
       type: 'bool',
-      required: true
+      required: false
     },
     {
       name: 'additional',
