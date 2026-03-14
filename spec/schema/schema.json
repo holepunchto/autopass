@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 1,
   "schema": [
     {
       "name": "records",
@@ -45,12 +45,22 @@
       "name": "writer",
       "namespace": "autopass",
       "compact": false,
-      "flagsPosition": -1,
+      "flagsPosition": 1,
       "fields": [
         {
           "name": "key",
           "required": true,
           "type": "buffer",
+          "version": 1
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "version": 1
+        },
+        {
+          "name": "readOnly",
+          "type": "bool",
           "version": 1
         }
       ]
@@ -65,6 +75,58 @@
           "name": "key",
           "required": true,
           "type": "string",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "invitee",
+      "namespace": "autopass",
+      "compact": false,
+      "flagsPosition": 1,
+      "fields": [
+        {
+          "name": "key",
+          "required": true,
+          "type": "fixed32",
+          "version": 1
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "public-invite-metadata",
+      "namespace": "autopass",
+      "compact": false,
+      "flagsPosition": 0,
+      "fields": [
+        {
+          "name": "readOnly",
+          "type": "bool",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "name": "additional-invite-data",
+      "namespace": "autopass",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "data",
+          "required": true,
+          "type": "buffer",
+          "version": 1
+        },
+        {
+          "name": "signature",
+          "required": true,
+          "type": "buffer",
           "version": 1
         }
       ]
@@ -103,13 +165,13 @@
           "name": "readOnly",
           "required": false,
           "type": "bool",
-          "version": 2
+          "version": 1
         },
         {
           "name": "additional",
           "required": false,
           "type": "@autopass/additional-invite-data",
-          "version": 3
+          "version": 1
         }
       ]
     },
@@ -138,26 +200,6 @@
           "required": true,
           "type": "fixed32",
           "version": 1
-        }
-      ]
-    },
-    {
-      "name": "additional-invite-data",
-      "namespace": "autopass",
-      "compact": false,
-      "flagsPosition": -1,
-      "fields": [
-        {
-          "name": "data",
-          "required": true,
-          "type": "buffer",
-          "version": 3
-        },
-        {
-          "name": "signature",
-          "required": true,
-          "type": "buffer",
-          "version": 3
         }
       ]
     }

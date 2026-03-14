@@ -4,7 +4,7 @@
 const { IndexEncoder, c, b4a } = require('hyperdb/runtime')
 const { version, getEncoding, setVersion } = require('./messages.js')
 
-const versions = { schema: version, db: 0 }
+const versions = { schema: version, db: 1 }
 
 // '@autopass/records' collection key
 const collection0_key = new IndexEncoder([IndexEncoder.STRING], { prefix: 0 })
@@ -22,6 +22,9 @@ function collection0_reconstruct(schemaVersion, keyBuf, valueBuf) {
   const key = collection0_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
+  const type = c.uint.decode(state)
+  if (type !== 0) throw new Error('Unknown collection type: ' + type)
+  collection0.decodedVersion = c.uint.decode(state)
   const record = collection0_enc.decode(state)
   record.key = key[0]
   return record
@@ -38,7 +41,7 @@ function collection0_reconstruct_key(keyBuf) {
 const collection0 = {
   name: '@autopass/records',
   id: 0,
-  version: 0,
+  version: 1,
   encodeKey(record) {
     const key = [record.key]
     return collection0_key.encode(key)
@@ -53,9 +56,11 @@ const collection0 = {
   },
   encodeValue(schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 0, buffer: null }
+    const state = { start: 0, end: 2, buffer: null }
     collection0_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
+    state.buffer[state.start++] = 0
+    state.buffer[state.start++] = collectionVersion
     collection0_enc.encode(state, record)
     return state.buffer
   },
@@ -82,6 +87,9 @@ function collection1_reconstruct(schemaVersion, keyBuf, valueBuf) {
   const key = collection1_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
+  const type = c.uint.decode(state)
+  if (type !== 0) throw new Error('Unknown collection type: ' + type)
+  collection1.decodedVersion = c.uint.decode(state)
   const record = collection1_enc.decode(state)
   record.id = key[0]
   return record
@@ -98,7 +106,7 @@ function collection1_reconstruct_key(keyBuf) {
 const collection1 = {
   name: '@autopass/invite',
   id: 1,
-  version: 0,
+  version: 1,
   encodeKey(record) {
     const key = [record.id]
     return collection1_key.encode(key)
@@ -113,9 +121,11 @@ const collection1 = {
   },
   encodeValue(schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 0, buffer: null }
+    const state = { start: 0, end: 2, buffer: null }
     collection1_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
+    state.buffer[state.start++] = 0
+    state.buffer[state.start++] = collectionVersion
     collection1_enc.encode(state, record)
     return state.buffer
   },
@@ -142,6 +152,9 @@ function collection2_reconstruct(schemaVersion, keyBuf, valueBuf) {
   const key = collection2_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
+  const type = c.uint.decode(state)
+  if (type !== 0) throw new Error('Unknown collection type: ' + type)
+  collection2.decodedVersion = c.uint.decode(state)
   const record = collection2_enc.decode(state)
   record.key = key[0]
   return record
@@ -158,7 +171,7 @@ function collection2_reconstruct_key(keyBuf) {
 const collection2 = {
   name: '@autopass/mirrors',
   id: 2,
-  version: 0,
+  version: 1,
   encodeKey(record) {
     const key = [record.key]
     return collection2_key.encode(key)
@@ -173,9 +186,11 @@ const collection2 = {
   },
   encodeValue(schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 0, buffer: null }
+    const state = { start: 0, end: 2, buffer: null }
     collection2_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
+    state.buffer[state.start++] = 0
+    state.buffer[state.start++] = collectionVersion
     collection2_enc.encode(state, record)
     return state.buffer
   },
@@ -202,6 +217,9 @@ function collection3_reconstruct(schemaVersion, keyBuf, valueBuf) {
   const key = collection3_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
+  const type = c.uint.decode(state)
+  if (type !== 0) throw new Error('Unknown collection type: ' + type)
+  collection3.decodedVersion = c.uint.decode(state)
   const record = collection3_enc.decode(state)
   record.key = key[0]
   return record
@@ -218,7 +236,7 @@ function collection3_reconstruct_key(keyBuf) {
 const collection3 = {
   name: '@autopass/writer',
   id: 3,
-  version: 0,
+  version: 1,
   encodeKey(record) {
     const key = [record.key]
     return collection3_key.encode(key)
@@ -233,9 +251,11 @@ const collection3 = {
   },
   encodeValue(schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 0, buffer: null }
+    const state = { start: 0, end: 2, buffer: null }
     collection3_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
+    state.buffer[state.start++] = 0
+    state.buffer[state.start++] = collectionVersion
     collection3_enc.encode(state, record)
     return state.buffer
   },
@@ -262,6 +282,9 @@ function collection4_reconstruct(schemaVersion, keyBuf, valueBuf) {
   const key = collection4_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
+  const type = c.uint.decode(state)
+  if (type !== 0) throw new Error('Unknown collection type: ' + type)
+  collection4.decodedVersion = c.uint.decode(state)
   const record = collection4_enc.decode(state)
   record.key = key[0]
   return record
@@ -278,7 +301,7 @@ function collection4_reconstruct_key(keyBuf) {
 const collection4 = {
   name: '@autopass/delete',
   id: 4,
-  version: 0,
+  version: 1,
   encodeKey(record) {
     const key = [record.key]
     return collection4_key.encode(key)
@@ -293,9 +316,11 @@ const collection4 = {
   },
   encodeValue(schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 0, buffer: null }
+    const state = { start: 0, end: 2, buffer: null }
     collection4_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
+    state.buffer[state.start++] = 0
+    state.buffer[state.start++] = collectionVersion
     collection4_enc.encode(state, record)
     return state.buffer
   },
@@ -322,6 +347,9 @@ function collection5_reconstruct(schemaVersion, keyBuf, valueBuf) {
   const key = collection5_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
+  const type = c.uint.decode(state)
+  if (type !== 0) throw new Error('Unknown collection type: ' + type)
+  collection5.decodedVersion = c.uint.decode(state)
   const record = collection5_enc.decode(state)
   record.id = key[0]
   return record
@@ -338,7 +366,7 @@ function collection5_reconstruct_key(keyBuf) {
 const collection5 = {
   name: '@autopass/del-invite',
   id: 5,
-  version: 0,
+  version: 1,
   encodeKey(record) {
     const key = [record.id]
     return collection5_key.encode(key)
@@ -353,9 +381,11 @@ const collection5 = {
   },
   encodeValue(schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 0, buffer: null }
+    const state = { start: 0, end: 2, buffer: null }
     collection5_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
+    state.buffer[state.start++] = 0
+    state.buffer[state.start++] = collectionVersion
     collection5_enc.encode(state, record)
     return state.buffer
   },
@@ -382,6 +412,9 @@ function collection6_reconstruct(schemaVersion, keyBuf, valueBuf) {
   const key = collection6_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
+  const type = c.uint.decode(state)
+  if (type !== 0) throw new Error('Unknown collection type: ' + type)
+  collection6.decodedVersion = c.uint.decode(state)
   const record = collection6_enc.decode(state)
   record.key = key[0]
   return record
@@ -398,7 +431,7 @@ function collection6_reconstruct_key(keyBuf) {
 const collection6 = {
   name: '@autopass/del-mirror',
   id: 6,
-  version: 0,
+  version: 1,
   encodeKey(record) {
     const key = [record.key]
     return collection6_key.encode(key)
@@ -413,9 +446,11 @@ const collection6 = {
   },
   encodeValue(schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 0, buffer: null }
+    const state = { start: 0, end: 2, buffer: null }
     collection6_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
+    state.buffer[state.start++] = 0
+    state.buffer[state.start++] = collectionVersion
     collection6_enc.encode(state, record)
     return state.buffer
   },
