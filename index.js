@@ -305,8 +305,8 @@ class Autopass extends ReadyResource {
     return this.base.view.find('@autopass/writer', query)
   }
 
-  async getWriter(query) {
-    return this.base.view.get('@autopass/writer', query)
+  async getWriter(key) {
+    return this.base.view.get('@autopass/writer', { key })
   }
 
   async addWriter(data) {
