@@ -71,13 +71,30 @@ Add new entry
 
 Remove an entry.
 
+#### `stream = pass.listWriters(query)`
+
+List all writers, optionally takes a hyperdb query
+
+#### `writer = await pass.getWriter(key)
+
+Get a writer, object similar to the addWriter input.
+
 #### `await pass.removeWriter(writerKey)`
 
 Remove a writer explictly.
 
-#### `await pass.addWriter(writerKey)`
+#### `await pass.addWriter(writer)`
 
 Add a writer explictly.
+Writer should look like this
+
+```
+{
+  key: otherSidesLocalWriterKey,
+  name: 'optional name for the writer',
+  readOnly: false // weather the person can write or only read
+}
+```
 
 #### `pass.writerKey`
 
@@ -127,7 +144,7 @@ Fully close the pass instance.
 
 Suspend the swarm and discovery
 
-#### `await pass.resume`
+#### `await pass.resume()`
 
 Resume the swarm is suspended
 
