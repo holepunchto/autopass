@@ -310,7 +310,7 @@ class Autopass extends ReadyResource {
   }
 
   async addWriter(data) {
-    if (typeof key === 'string') key = b4a.from(key, 'hex')
+    if (typeof data === 'string') data = b4a.from(data, 'hex')
     if (b4a.isBuffer(data)) data = { key: data, name: null, readOnly: false }
     await this.base.append(encode('@autopass/add-writer', data))
     return true
