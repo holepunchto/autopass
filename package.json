@@ -3,8 +3,9 @@
   "version": "3.3.0",
   "main": "index.js",
   "scripts": {
-    "brittle": "npx brittle test.js",
-    "lint": "npx prettier . --check",
+    "brittle": "brittle test.js",
+    "lint": "prettier . --check",
+    "format": "prettier . --write",
     "test": "npm run lint && npm run brittle"
   },
   "author": "Holepunch Inc",

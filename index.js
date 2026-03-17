@@ -12,6 +12,12 @@ const { Router, encode, decode } = require('./spec/hyperdispatch')
 const BlindPeering = require('blind-peering')
 const db = require('./spec/db/index.js')
 const enc = require('hypercore-id-encoding')
+const c = require('compact-encoding')
+
+const { getEncoding } = require('./spec/schema/index.js')
+
+const PUBLIC_INVITE_METADATA = getEncoding('@autopass/public-invite-metadata')
+const INVITEE = getEncoding('@autopass/invitee')
 
 class AutopassPairer extends ReadyResource {
   constructor(store, invite, opts = {}) {
@@ -29,6 +35,7 @@ class AutopassPairer extends ReadyResource {
     this.pass = null
     this.relayThrough = opts.relayThrough || null
     this.blindEncryption = opts.blindEncryption || null
+    this.name = opts.name || null
 
     this.ready().catch(noop)
   }
@@ -54,9 +61,10 @@ class AutopassPairer extends ReadyResource {
     await core.ready()
     const key = core.key
     await core.close()
+
     this.candidate = this.pairing.addCandidate({
       invite: z32.decode(this.invite),
-      userData: key,
+      userData: c.encode(INVITEE, { key, name: this.name }),
       onadd: async (result) => {
         if (this.pass === null) {
           this.pass = new Autopass(this.store, {
@@ -70,10 +78,12 @@ class AutopassPairer extends ReadyResource {
 
           await this.pass.deleteInvite()
         }
-        const readOnly = JSON.parse(result.data.toString()).readOnly
+
+        const metadata = result.data ? c.decode(PUBLIC_INVITE_METADATA, result.data) : null
+
         this.swarm = null
         this.store = null
-        if (this.onresolve && readOnly) {
+        if (this.onresolve && metadata && metadata.readOnly) {
           this._whenReadable()
         } else if (this.onresolve) {
           this._whenWritable()
@@ -84,11 +94,7 @@ class AutopassPairer extends ReadyResource {
   }
 
   _whenReadable() {
-    const check = () => {
-      this.pass.base.off('update', check)
-      this.onresolve(this.pass)
-    }
-    this.pass.base.on('update', check)
+    this.onresolve(this.pass)
   }
 
   _whenWritable() {
@@ -149,11 +155,13 @@ class Autopass extends ReadyResource {
     this.debug = !!opts.key
     // Register handlers for commands
     this.router.add('@autopass/remove-writer', async (data, context) => {
+      await context.view.delete('@autopass/writer', data)
       await context.base.removeWriter(data.key)
     })
 
     this.router.add('@autopass/add-writer', async (data, context) => {
-      await context.base.addWriter(data.key)
+      await context.view.insert('@autopass/writer', data)
+      if (!data.readOnly) await context.base.addWriter(data.key)
     })
 
     this.router.add('@autopass/put', async (data, context) => {
@@ -263,7 +271,7 @@ class Autopass extends ReadyResource {
     const { id, invite, publicKey, expires, additional } = BlindPairing.createInvite(
       this.base.key,
       {
-        data: Buffer.from(JSON.stringify({ readOnly }))
+        data: c.encode(PUBLIC_INVITE_METADATA, { readOnly })
       }
     )
 
@@ -293,19 +301,25 @@ class Autopass extends ReadyResource {
     return { value: data.value, file: data.file }
   }
 
-  async addWriter(key) {
-    await this.base.append(
-      encode('@autopass/add-writer', {
-        key: b4a.isBuffer(key) ? key : b4a.from(key)
-      })
-    )
+  listWriters(query) {
+    return this.base.view.find('@autopass/writer', query)
+  }
+
+  async getWriter(key) {
+    return this.base.view.get('@autopass/writer', { key })
+  }
+
+  async addWriter(data) {
+    if (typeof data === 'string') data = b4a.from(data, 'hex')
+    if (b4a.isBuffer(data)) data = { key: data, name: null, readOnly: false }
+    await this.base.append(encode('@autopass/add-writer', data))
     return true
   }
 
   async removeWriter(key) {
     await this.base.append(
       encode('@autopass/remove-writer', {
-        key: b4a.isBuffer(key) ? key : b4a.from(key)
+        key: b4a.isBuffer(key) ? key : b4a.from(key, 'hex')
       })
     )
   }
@@ -337,9 +351,8 @@ class Autopass extends ReadyResource {
         }
         const readOnly = inv.readOnly
         candidate.open(inv.publicKey)
-        if (!readOnly) {
-          await this.addWriter(candidate.userData)
-        }
+        const { key, name } = c.decode(INVITEE, candidate.userData)
+        await this.addWriter({ key, name, readOnly })
         candidate.confirm({
           key: this.base.key,
           encryptionKey: this.base.encryptionKey,

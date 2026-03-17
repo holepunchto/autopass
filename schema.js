@@ -4,9 +4,9 @@ const Hyperdispatch = require('hyperdispatch')
 
 // SCHEMA CREATION START //
 const autopass = Hyperschema.from('./spec/schema')
-const template = autopass.namespace('autopass')
+const pass = autopass.namespace('autopass')
 // You can find a list of supported data types here: https://github.com/holepunchto/compact-encoding
-template.register({
+pass.register({
   name: 'records',
   compact: false,
   fields: [
@@ -27,7 +27,7 @@ template.register({
     }
   ]
 })
-template.register({
+pass.register({
   name: 'mirrors',
   compact: false,
   fields: [
@@ -38,7 +38,7 @@ template.register({
     }
   ]
 })
-template.register({
+pass.register({
   name: 'writer',
   compact: false,
   fields: [
@@ -46,11 +46,19 @@ template.register({
       name: 'key',
       type: 'buffer',
       required: true
+    },
+    {
+      name: 'name',
+      type: 'string'
+    },
+    {
+      name: 'readOnly',
+      type: 'bool'
     }
   ]
 })
 
-template.register({
+pass.register({
   name: 'delete',
   compact: false,
   fields: [
@@ -62,7 +70,20 @@ template.register({
   ]
 })
 
-template.register({
+pass.register({
+  name: 'invitee',
+  fields: [
+    { name: 'key', type: 'fixed32', required: true },
+    { name: 'name', type: 'string' }
+  ]
+})
+
+pass.register({
+  name: 'public-invite-metadata',
+  fields: [{ name: 'readOnly', type: 'bool' }]
+})
+
+pass.register({
   name: 'additional-invite-data',
   fields: [
     { name: 'data', type: 'buffer', required: true },
@@ -70,7 +91,7 @@ template.register({
   ]
 })
 
-template.register({
+pass.register({
   name: 'invite',
   compact: false,
   fields: [
@@ -107,7 +128,7 @@ template.register({
   ]
 })
 
-template.register({
+pass.register({
   name: 'del-invite',
   compact: false,
   fields: [
@@ -118,7 +139,7 @@ template.register({
     }
   ]
 })
-template.register({
+pass.register({
   name: 'del-mirror',
   compact: false,
   fields: [

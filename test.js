@@ -44,9 +44,8 @@ test('invites', async function (t) {
   await b.ready()
 
   t.teardown(async () => await b.close())
-  b.on('update', function () {
-    if (b.base.system.members === 2) t.pass('b has two members')
-  })
+  await updateUntil(b, () => b.base.system.members === 2)
+  t.pass('b has two members')
 })
 
 test('invites', async function (t) {
@@ -76,9 +75,41 @@ test('invites', async function (t) {
   await b.ready()
 
   t.teardown(async () => await b.close())
-  b.on('update', function () {
-    if (b.base.system.members === 2) t.pass('b has two members')
+  await updateUntil(b, () => b.base.system.members === 2)
+  t.pass('b has two members')
+})
+
+test.solo('invite with name', async function (t) {
+  t.plan(3)
+
+  const tn = await testnet(10, t)
+
+  const a = await create(t, { bootstrap: tn.bootstrap })
+  t.teardown(async () => {
+    await a.close()
   })
+
+  const updateListener = function () {
+    if (a.base.system.members === 2) {
+      t.pass('a has two members')
+      a.removeListener('update', updateListener) // Remove the listener in teardown
+    }
+  }
+
+  a.on('update', updateListener)
+
+  const inv = await a.createInvite()
+
+  const p = await pair(t, inv, { bootstrap: tn.bootstrap, name: 'maf' })
+
+  const b = await p.finished()
+  await b.ready()
+
+  t.teardown(async () => await b.close())
+  await updateUntil(b, () => b.base.system.members === 2)
+  t.pass('b has two members')
+  const arr = await b.listWriters().toArray()
+  t.is(arr[0].name, 'maf')
 })
 
 test('invite resets when createInvite type is different than previous', async function (t) {
@@ -143,9 +174,8 @@ test('blind encryption', async function (t) {
   t.ok(encryptionKeyEncryptedBuffer)
 
   t.teardown(async () => await b.close())
-  b.on('update', function () {
-    if (b.base.system.members === 2) t.pass('b has two members')
-  })
+  await updateUntil(b, () => b.base.system.members === 2)
+  if (b.base.system.members === 2) t.pass('b has two members')
 })
 
 test('suspend and resume', async function (t) {
@@ -206,4 +236,16 @@ async function pair(t, inv, opts) {
   const dir = await tmp(t)
   const a = Autopass.pair(new Corestore(dir), inv, opts)
   return a
+}
+
+function updateUntil(b, fn) {
+  return new Promise((resolve) => {
+    if (fn()) return resolve()
+    const check = () => {
+      if (!fn()) return
+      b.off('update', check)
+      resolve()
+    }
+    b.on('update', check)
+  })
 }
