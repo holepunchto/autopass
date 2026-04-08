@@ -4,12 +4,14 @@
 const { IndexEncoder, c, b4a } = require('hyperdb/runtime')
 const { version, getEncoding, setVersion } = require('./messages.js')
 
-const versions = { schema: version, db: 1 }
+const versions = { schema: version, db: 0 }
 
 // '@autopass/records' collection key
-const collection0_key = new IndexEncoder([IndexEncoder.STRING], { prefix: 0 })
+const collection0_key = new IndexEncoder([
+  IndexEncoder.STRING
+], { prefix: 0 })
 
-function collection0_indexify(record) {
+function collection0_indexify (record) {
   const a = record.key
   return a === undefined ? [] : [a]
 }
@@ -18,19 +20,16 @@ function collection0_indexify(record) {
 const collection0_enc = getEncoding('@autopass/records/hyperdb#0')
 
 // '@autopass/records' reconstruction function
-function collection0_reconstruct(schemaVersion, keyBuf, valueBuf) {
+function collection0_reconstruct (schemaVersion, keyBuf, valueBuf) {
   const key = collection0_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
-  const type = c.uint.decode(state)
-  if (type !== 0) throw new Error('Unknown collection type: ' + type)
-  collection0.decodedVersion = c.uint.decode(state)
   const record = collection0_enc.decode(state)
   record.key = key[0]
   return record
 }
 // '@autopass/records' key reconstruction function
-function collection0_reconstruct_key(keyBuf) {
+function collection0_reconstruct_key (keyBuf) {
   const key = collection0_key.decode(keyBuf)
   return {
     key: key[0]
@@ -41,12 +40,12 @@ function collection0_reconstruct_key(keyBuf) {
 const collection0 = {
   name: '@autopass/records',
   id: 0,
-  version: 1,
-  encodeKey(record) {
+  version: 0,
+  encodeKey (record) {
     const key = [record.key]
     return collection0_key.encode(key)
   },
-  encodeKeyRange({ gt, lt, gte, lte } = {}) {
+  encodeKeyRange ({ gt, lt, gte, lte } = {}) {
     return collection0_key.encodeRange({
       gt: gt ? collection0_indexify(gt) : null,
       lt: lt ? collection0_indexify(lt) : null,
@@ -54,13 +53,11 @@ const collection0 = {
       lte: lte ? collection0_indexify(lte) : null
     })
   },
-  encodeValue(schemaVersion, collectionVersion, record) {
+  encodeValue (schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 2, buffer: null }
+    const state = { start: 0, end: 0, buffer: null }
     collection0_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
-    state.buffer[state.start++] = 0
-    state.buffer[state.start++] = collectionVersion
     collection0_enc.encode(state, record)
     return state.buffer
   },
@@ -72,9 +69,11 @@ const collection0 = {
 }
 
 // '@autopass/invite' collection key
-const collection1_key = new IndexEncoder([IndexEncoder.BUFFER], { prefix: 1 })
+const collection1_key = new IndexEncoder([
+  IndexEncoder.BUFFER
+], { prefix: 1 })
 
-function collection1_indexify(record) {
+function collection1_indexify (record) {
   const a = record.id
   return a === undefined ? [] : [a]
 }
@@ -83,19 +82,16 @@ function collection1_indexify(record) {
 const collection1_enc = getEncoding('@autopass/invite/hyperdb#1')
 
 // '@autopass/invite' reconstruction function
-function collection1_reconstruct(schemaVersion, keyBuf, valueBuf) {
+function collection1_reconstruct (schemaVersion, keyBuf, valueBuf) {
   const key = collection1_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
-  const type = c.uint.decode(state)
-  if (type !== 0) throw new Error('Unknown collection type: ' + type)
-  collection1.decodedVersion = c.uint.decode(state)
   const record = collection1_enc.decode(state)
   record.id = key[0]
   return record
 }
 // '@autopass/invite' key reconstruction function
-function collection1_reconstruct_key(keyBuf) {
+function collection1_reconstruct_key (keyBuf) {
   const key = collection1_key.decode(keyBuf)
   return {
     id: key[0]
@@ -106,12 +102,12 @@ function collection1_reconstruct_key(keyBuf) {
 const collection1 = {
   name: '@autopass/invite',
   id: 1,
-  version: 1,
-  encodeKey(record) {
+  version: 0,
+  encodeKey (record) {
     const key = [record.id]
     return collection1_key.encode(key)
   },
-  encodeKeyRange({ gt, lt, gte, lte } = {}) {
+  encodeKeyRange ({ gt, lt, gte, lte } = {}) {
     return collection1_key.encodeRange({
       gt: gt ? collection1_indexify(gt) : null,
       lt: lt ? collection1_indexify(lt) : null,
@@ -119,13 +115,11 @@ const collection1 = {
       lte: lte ? collection1_indexify(lte) : null
     })
   },
-  encodeValue(schemaVersion, collectionVersion, record) {
+  encodeValue (schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 2, buffer: null }
+    const state = { start: 0, end: 0, buffer: null }
     collection1_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
-    state.buffer[state.start++] = 0
-    state.buffer[state.start++] = collectionVersion
     collection1_enc.encode(state, record)
     return state.buffer
   },
@@ -137,9 +131,11 @@ const collection1 = {
 }
 
 // '@autopass/mirrors' collection key
-const collection2_key = new IndexEncoder([IndexEncoder.BUFFER], { prefix: 2 })
+const collection2_key = new IndexEncoder([
+  IndexEncoder.BUFFER
+], { prefix: 2 })
 
-function collection2_indexify(record) {
+function collection2_indexify (record) {
   const a = record.key
   return a === undefined ? [] : [a]
 }
@@ -148,19 +144,16 @@ function collection2_indexify(record) {
 const collection2_enc = getEncoding('@autopass/mirrors/hyperdb#2')
 
 // '@autopass/mirrors' reconstruction function
-function collection2_reconstruct(schemaVersion, keyBuf, valueBuf) {
+function collection2_reconstruct (schemaVersion, keyBuf, valueBuf) {
   const key = collection2_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
-  const type = c.uint.decode(state)
-  if (type !== 0) throw new Error('Unknown collection type: ' + type)
-  collection2.decodedVersion = c.uint.decode(state)
   const record = collection2_enc.decode(state)
   record.key = key[0]
   return record
 }
 // '@autopass/mirrors' key reconstruction function
-function collection2_reconstruct_key(keyBuf) {
+function collection2_reconstruct_key (keyBuf) {
   const key = collection2_key.decode(keyBuf)
   return {
     key: key[0]
@@ -171,12 +164,12 @@ function collection2_reconstruct_key(keyBuf) {
 const collection2 = {
   name: '@autopass/mirrors',
   id: 2,
-  version: 1,
-  encodeKey(record) {
+  version: 0,
+  encodeKey (record) {
     const key = [record.key]
     return collection2_key.encode(key)
   },
-  encodeKeyRange({ gt, lt, gte, lte } = {}) {
+  encodeKeyRange ({ gt, lt, gte, lte } = {}) {
     return collection2_key.encodeRange({
       gt: gt ? collection2_indexify(gt) : null,
       lt: lt ? collection2_indexify(lt) : null,
@@ -184,13 +177,11 @@ const collection2 = {
       lte: lte ? collection2_indexify(lte) : null
     })
   },
-  encodeValue(schemaVersion, collectionVersion, record) {
+  encodeValue (schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 2, buffer: null }
+    const state = { start: 0, end: 0, buffer: null }
     collection2_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
-    state.buffer[state.start++] = 0
-    state.buffer[state.start++] = collectionVersion
     collection2_enc.encode(state, record)
     return state.buffer
   },
@@ -202,9 +193,11 @@ const collection2 = {
 }
 
 // '@autopass/writer' collection key
-const collection3_key = new IndexEncoder([IndexEncoder.BUFFER], { prefix: 3 })
+const collection3_key = new IndexEncoder([
+  IndexEncoder.BUFFER
+], { prefix: 3 })
 
-function collection3_indexify(record) {
+function collection3_indexify (record) {
   const a = record.key
   return a === undefined ? [] : [a]
 }
@@ -213,19 +206,16 @@ function collection3_indexify(record) {
 const collection3_enc = getEncoding('@autopass/writer/hyperdb#3')
 
 // '@autopass/writer' reconstruction function
-function collection3_reconstruct(schemaVersion, keyBuf, valueBuf) {
+function collection3_reconstruct (schemaVersion, keyBuf, valueBuf) {
   const key = collection3_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
-  const type = c.uint.decode(state)
-  if (type !== 0) throw new Error('Unknown collection type: ' + type)
-  collection3.decodedVersion = c.uint.decode(state)
   const record = collection3_enc.decode(state)
   record.key = key[0]
   return record
 }
 // '@autopass/writer' key reconstruction function
-function collection3_reconstruct_key(keyBuf) {
+function collection3_reconstruct_key (keyBuf) {
   const key = collection3_key.decode(keyBuf)
   return {
     key: key[0]
@@ -236,12 +226,12 @@ function collection3_reconstruct_key(keyBuf) {
 const collection3 = {
   name: '@autopass/writer',
   id: 3,
-  version: 1,
-  encodeKey(record) {
+  version: 0,
+  encodeKey (record) {
     const key = [record.key]
     return collection3_key.encode(key)
   },
-  encodeKeyRange({ gt, lt, gte, lte } = {}) {
+  encodeKeyRange ({ gt, lt, gte, lte } = {}) {
     return collection3_key.encodeRange({
       gt: gt ? collection3_indexify(gt) : null,
       lt: lt ? collection3_indexify(lt) : null,
@@ -249,13 +239,11 @@ const collection3 = {
       lte: lte ? collection3_indexify(lte) : null
     })
   },
-  encodeValue(schemaVersion, collectionVersion, record) {
+  encodeValue (schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 2, buffer: null }
+    const state = { start: 0, end: 0, buffer: null }
     collection3_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
-    state.buffer[state.start++] = 0
-    state.buffer[state.start++] = collectionVersion
     collection3_enc.encode(state, record)
     return state.buffer
   },
@@ -267,9 +255,11 @@ const collection3 = {
 }
 
 // '@autopass/delete' collection key
-const collection4_key = new IndexEncoder([IndexEncoder.STRING], { prefix: 4 })
+const collection4_key = new IndexEncoder([
+  IndexEncoder.STRING
+], { prefix: 4 })
 
-function collection4_indexify(record) {
+function collection4_indexify (record) {
   const a = record.key
   return a === undefined ? [] : [a]
 }
@@ -278,19 +268,16 @@ function collection4_indexify(record) {
 const collection4_enc = getEncoding('@autopass/delete/hyperdb#4')
 
 // '@autopass/delete' reconstruction function
-function collection4_reconstruct(schemaVersion, keyBuf, valueBuf) {
+function collection4_reconstruct (schemaVersion, keyBuf, valueBuf) {
   const key = collection4_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
-  const type = c.uint.decode(state)
-  if (type !== 0) throw new Error('Unknown collection type: ' + type)
-  collection4.decodedVersion = c.uint.decode(state)
   const record = collection4_enc.decode(state)
   record.key = key[0]
   return record
 }
 // '@autopass/delete' key reconstruction function
-function collection4_reconstruct_key(keyBuf) {
+function collection4_reconstruct_key (keyBuf) {
   const key = collection4_key.decode(keyBuf)
   return {
     key: key[0]
@@ -301,12 +288,12 @@ function collection4_reconstruct_key(keyBuf) {
 const collection4 = {
   name: '@autopass/delete',
   id: 4,
-  version: 1,
-  encodeKey(record) {
+  version: 0,
+  encodeKey (record) {
     const key = [record.key]
     return collection4_key.encode(key)
   },
-  encodeKeyRange({ gt, lt, gte, lte } = {}) {
+  encodeKeyRange ({ gt, lt, gte, lte } = {}) {
     return collection4_key.encodeRange({
       gt: gt ? collection4_indexify(gt) : null,
       lt: lt ? collection4_indexify(lt) : null,
@@ -314,13 +301,11 @@ const collection4 = {
       lte: lte ? collection4_indexify(lte) : null
     })
   },
-  encodeValue(schemaVersion, collectionVersion, record) {
+  encodeValue (schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 2, buffer: null }
+    const state = { start: 0, end: 0, buffer: null }
     collection4_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
-    state.buffer[state.start++] = 0
-    state.buffer[state.start++] = collectionVersion
     collection4_enc.encode(state, record)
     return state.buffer
   },
@@ -332,9 +317,11 @@ const collection4 = {
 }
 
 // '@autopass/del-invite' collection key
-const collection5_key = new IndexEncoder([IndexEncoder.BUFFER], { prefix: 5 })
+const collection5_key = new IndexEncoder([
+  IndexEncoder.BUFFER
+], { prefix: 5 })
 
-function collection5_indexify(record) {
+function collection5_indexify (record) {
   const a = record.id
   return a === undefined ? [] : [a]
 }
@@ -343,19 +330,16 @@ function collection5_indexify(record) {
 const collection5_enc = getEncoding('@autopass/del-invite/hyperdb#5')
 
 // '@autopass/del-invite' reconstruction function
-function collection5_reconstruct(schemaVersion, keyBuf, valueBuf) {
+function collection5_reconstruct (schemaVersion, keyBuf, valueBuf) {
   const key = collection5_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
-  const type = c.uint.decode(state)
-  if (type !== 0) throw new Error('Unknown collection type: ' + type)
-  collection5.decodedVersion = c.uint.decode(state)
   const record = collection5_enc.decode(state)
   record.id = key[0]
   return record
 }
 // '@autopass/del-invite' key reconstruction function
-function collection5_reconstruct_key(keyBuf) {
+function collection5_reconstruct_key (keyBuf) {
   const key = collection5_key.decode(keyBuf)
   return {
     id: key[0]
@@ -366,12 +350,12 @@ function collection5_reconstruct_key(keyBuf) {
 const collection5 = {
   name: '@autopass/del-invite',
   id: 5,
-  version: 1,
-  encodeKey(record) {
+  version: 0,
+  encodeKey (record) {
     const key = [record.id]
     return collection5_key.encode(key)
   },
-  encodeKeyRange({ gt, lt, gte, lte } = {}) {
+  encodeKeyRange ({ gt, lt, gte, lte } = {}) {
     return collection5_key.encodeRange({
       gt: gt ? collection5_indexify(gt) : null,
       lt: lt ? collection5_indexify(lt) : null,
@@ -379,13 +363,11 @@ const collection5 = {
       lte: lte ? collection5_indexify(lte) : null
     })
   },
-  encodeValue(schemaVersion, collectionVersion, record) {
+  encodeValue (schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 2, buffer: null }
+    const state = { start: 0, end: 0, buffer: null }
     collection5_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
-    state.buffer[state.start++] = 0
-    state.buffer[state.start++] = collectionVersion
     collection5_enc.encode(state, record)
     return state.buffer
   },
@@ -397,9 +379,11 @@ const collection5 = {
 }
 
 // '@autopass/del-mirror' collection key
-const collection6_key = new IndexEncoder([IndexEncoder.BUFFER], { prefix: 6 })
+const collection6_key = new IndexEncoder([
+  IndexEncoder.BUFFER
+], { prefix: 6 })
 
-function collection6_indexify(record) {
+function collection6_indexify (record) {
   const a = record.key
   return a === undefined ? [] : [a]
 }
@@ -408,19 +392,16 @@ function collection6_indexify(record) {
 const collection6_enc = getEncoding('@autopass/del-mirror/hyperdb#6')
 
 // '@autopass/del-mirror' reconstruction function
-function collection6_reconstruct(schemaVersion, keyBuf, valueBuf) {
+function collection6_reconstruct (schemaVersion, keyBuf, valueBuf) {
   const key = collection6_key.decode(keyBuf)
   setVersion(schemaVersion)
   const state = { start: 0, end: valueBuf.byteLength, buffer: valueBuf }
-  const type = c.uint.decode(state)
-  if (type !== 0) throw new Error('Unknown collection type: ' + type)
-  collection6.decodedVersion = c.uint.decode(state)
   const record = collection6_enc.decode(state)
   record.key = key[0]
   return record
 }
 // '@autopass/del-mirror' key reconstruction function
-function collection6_reconstruct_key(keyBuf) {
+function collection6_reconstruct_key (keyBuf) {
   const key = collection6_key.decode(keyBuf)
   return {
     key: key[0]
@@ -431,12 +412,12 @@ function collection6_reconstruct_key(keyBuf) {
 const collection6 = {
   name: '@autopass/del-mirror',
   id: 6,
-  version: 1,
-  encodeKey(record) {
+  version: 0,
+  encodeKey (record) {
     const key = [record.key]
     return collection6_key.encode(key)
   },
-  encodeKeyRange({ gt, lt, gte, lte } = {}) {
+  encodeKeyRange ({ gt, lt, gte, lte } = {}) {
     return collection6_key.encodeRange({
       gt: gt ? collection6_indexify(gt) : null,
       lt: lt ? collection6_indexify(lt) : null,
@@ -444,13 +425,11 @@ const collection6 = {
       lte: lte ? collection6_indexify(lte) : null
     })
   },
-  encodeValue(schemaVersion, collectionVersion, record) {
+  encodeValue (schemaVersion, collectionVersion, record) {
     setVersion(schemaVersion)
-    const state = { start: 0, end: 2, buffer: null }
+    const state = { start: 0, end: 0, buffer: null }
     collection6_enc.preencode(state, record)
     state.buffer = b4a.allocUnsafe(state.end)
-    state.buffer[state.start++] = 0
-    state.buffer[state.start++] = collectionVersion
     collection6_enc.encode(state, record)
     return state.buffer
   },
@@ -471,34 +450,26 @@ const collections = [
   collection6
 ]
 
-const indexes = []
+const indexes = [
+]
 
 module.exports = { versions, collections, indexes, resolveCollection, resolveIndex }
 
-function resolveCollection(name) {
+function resolveCollection (name) {
   switch (name) {
-    case '@autopass/records':
-      return collection0
-    case '@autopass/invite':
-      return collection1
-    case '@autopass/mirrors':
-      return collection2
-    case '@autopass/writer':
-      return collection3
-    case '@autopass/delete':
-      return collection4
-    case '@autopass/del-invite':
-      return collection5
-    case '@autopass/del-mirror':
-      return collection6
-    default:
-      return null
+    case '@autopass/records': return collection0
+    case '@autopass/invite': return collection1
+    case '@autopass/mirrors': return collection2
+    case '@autopass/writer': return collection3
+    case '@autopass/delete': return collection4
+    case '@autopass/del-invite': return collection5
+    case '@autopass/del-mirror': return collection6
+    default: return null
   }
 }
 
-function resolveIndex(name) {
+function resolveIndex (name) {
   switch (name) {
-    default:
-      return null
+    default: return null
   }
 }

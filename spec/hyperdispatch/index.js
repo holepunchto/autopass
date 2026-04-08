@@ -7,7 +7,7 @@ const { version, getEncoding, setVersion } = require('./messages.js')
 const defaultVersion = version
 
 class Router {
-  constructor() {
+  constructor () {
     this._handler0 = null
     this._handler1 = null
     this._handler2 = null
@@ -20,7 +20,7 @@ class Router {
     this._missing = 8
   }
 
-  add(name, handler) {
+  add (name, handler) {
     switch (name) {
       case '@autopass/remove-writer':
         this._handler0 = handler
@@ -52,7 +52,7 @@ class Router {
     this._missing--
   }
 
-  _checkAll() {
+  _checkAll () {
     assert(this._handler0 !== null, 'Missing handler for "@autopass/remove-writer"')
     assert(this._handler1 !== null, 'Missing handler for "@autopass/add-writer"')
     assert(this._handler2 !== null, 'Missing handler for "@autopass/put"')
@@ -63,7 +63,7 @@ class Router {
     assert(this._handler7 !== null, 'Missing handler for "@autopass/del-invite"')
   }
 
-  async dispatch(message, context) {
+  async dispatch (message, context) {
     if (this._missing > 0) {
       this._checkAll()
     }
@@ -95,7 +95,7 @@ class Router {
   }
 }
 
-function encode(name, message, { version = defaultVersion } = {}) {
+function encode (name, message, { version = defaultVersion } = {}) {
   const state = { buffer: null, start: 0, end: 0 }
 
   const route = getRouteByName(name)
@@ -111,7 +111,7 @@ function encode(name, message, { version = defaultVersion } = {}) {
   return state.buffer
 }
 
-function decode(buffer, { version = defaultVersion } = {}) {
+function decode (buffer, { version = defaultVersion } = {}) {
   const state = { buffer, start: 0, end: buffer.length }
 
   const id = c.uint.decode(state)
@@ -170,7 +170,7 @@ const route7 = {
   enc: getEncoding('@autopass/del-invite')
 }
 
-function getRouteByName(name) {
+function getRouteByName (name) {
   switch (name) {
     case '@autopass/remove-writer':
       return route0
@@ -193,7 +193,7 @@ function getRouteByName(name) {
   }
 }
 
-function getRouteById(id) {
+function getRouteById (id) {
   switch (id) {
     case 0:
       return route0

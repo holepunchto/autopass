@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 4,
   "schema": [
     {
       "name": "records",
@@ -56,12 +56,12 @@
         {
           "name": "name",
           "type": "string",
-          "version": 1
+          "version": 4
         },
         {
           "name": "readOnly",
           "type": "bool",
-          "version": 1
+          "version": 4
         }
       ]
     },
@@ -75,58 +75,6 @@
           "name": "key",
           "required": true,
           "type": "string",
-          "version": 1
-        }
-      ]
-    },
-    {
-      "name": "invitee",
-      "namespace": "autopass",
-      "compact": false,
-      "flagsPosition": 1,
-      "fields": [
-        {
-          "name": "key",
-          "required": true,
-          "type": "fixed32",
-          "version": 1
-        },
-        {
-          "name": "name",
-          "type": "string",
-          "version": 1
-        }
-      ]
-    },
-    {
-      "name": "public-invite-metadata",
-      "namespace": "autopass",
-      "compact": false,
-      "flagsPosition": 0,
-      "fields": [
-        {
-          "name": "readOnly",
-          "type": "bool",
-          "version": 1
-        }
-      ]
-    },
-    {
-      "name": "additional-invite-data",
-      "namespace": "autopass",
-      "compact": false,
-      "flagsPosition": -1,
-      "fields": [
-        {
-          "name": "data",
-          "required": true,
-          "type": "buffer",
-          "version": 1
-        },
-        {
-          "name": "signature",
-          "required": true,
-          "type": "buffer",
           "version": 1
         }
       ]
@@ -165,13 +113,13 @@
           "name": "readOnly",
           "required": false,
           "type": "bool",
-          "version": 1
+          "version": 2
         },
         {
           "name": "additional",
           "required": false,
           "type": "@autopass/additional-invite-data",
-          "version": 1
+          "version": 3
         }
       ]
     },
@@ -200,6 +148,58 @@
           "required": true,
           "type": "fixed32",
           "version": 1
+        }
+      ]
+    },
+    {
+      "name": "additional-invite-data",
+      "namespace": "autopass",
+      "compact": false,
+      "flagsPosition": -1,
+      "fields": [
+        {
+          "name": "data",
+          "required": true,
+          "type": "buffer",
+          "version": 3
+        },
+        {
+          "name": "signature",
+          "required": true,
+          "type": "buffer",
+          "version": 3
+        }
+      ]
+    },
+    {
+      "name": "invitee",
+      "namespace": "autopass",
+      "compact": false,
+      "flagsPosition": 1,
+      "fields": [
+        {
+          "name": "key",
+          "required": true,
+          "type": "fixed32",
+          "version": 4
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "version": 4
+        }
+      ]
+    },
+    {
+      "name": "public-invite-metadata",
+      "namespace": "autopass",
+      "compact": false,
+      "flagsPosition": 0,
+      "fields": [
+        {
+          "name": "readOnly",
+          "type": "bool",
+          "version": 4
         }
       ]
     }

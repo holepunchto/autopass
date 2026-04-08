@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 0,
   "offset": 0,
   "schema": [
     {
@@ -7,12 +7,14 @@
       "namespace": "autopass",
       "id": 0,
       "type": 1,
-      "version": 1,
+      "version": 0,
       "versionField": null,
       "indexes": [],
       "schema": "@autopass/records",
       "derived": false,
-      "key": ["key"],
+      "key": [
+        "key"
+      ],
       "trigger": null
     },
     {
@@ -20,12 +22,14 @@
       "namespace": "autopass",
       "id": 1,
       "type": 1,
-      "version": 1,
+      "version": 0,
       "versionField": null,
       "indexes": [],
       "schema": "@autopass/invite",
       "derived": false,
-      "key": ["id"],
+      "key": [
+        "id"
+      ],
       "trigger": null
     },
     {
@@ -33,12 +37,14 @@
       "namespace": "autopass",
       "id": 2,
       "type": 1,
-      "version": 1,
+      "version": 0,
       "versionField": null,
       "indexes": [],
       "schema": "@autopass/mirrors",
       "derived": false,
-      "key": ["key"],
+      "key": [
+        "key"
+      ],
       "trigger": null
     },
     {
@@ -46,12 +52,14 @@
       "namespace": "autopass",
       "id": 3,
       "type": 1,
-      "version": 1,
+      "version": 0,
       "versionField": null,
       "indexes": [],
       "schema": "@autopass/writer",
       "derived": false,
-      "key": ["key"],
+      "key": [
+        "key"
+      ],
       "trigger": null
     },
     {
@@ -59,12 +67,14 @@
       "namespace": "autopass",
       "id": 4,
       "type": 1,
-      "version": 1,
+      "version": 0,
       "versionField": null,
       "indexes": [],
       "schema": "@autopass/delete",
       "derived": false,
-      "key": ["key"],
+      "key": [
+        "key"
+      ],
       "trigger": null
     },
     {
@@ -72,12 +82,14 @@
       "namespace": "autopass",
       "id": 5,
       "type": 1,
-      "version": 1,
+      "version": 0,
       "versionField": null,
       "indexes": [],
       "schema": "@autopass/del-invite",
       "derived": false,
-      "key": ["id"],
+      "key": [
+        "id"
+      ],
       "trigger": null
     },
     {
@@ -85,12 +97,14 @@
       "namespace": "autopass",
       "id": 6,
       "type": 1,
-      "version": 1,
+      "version": 0,
       "versionField": null,
       "indexes": [],
       "schema": "@autopass/del-mirror",
       "derived": false,
-      "key": ["key"],
+      "key": [
+        "key"
+      ],
       "trigger": null
     }
   ]
